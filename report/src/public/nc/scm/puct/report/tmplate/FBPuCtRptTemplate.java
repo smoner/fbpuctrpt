@@ -1,38 +1,56 @@
 package nc.scm.puct.report.tmplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
+import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldConstant;
+import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldPreference;
+import nc.scm.puct.report.view.FBPuCtView;
+import nc.scmmm.pub.scmpub.report.rptutil.SCMProviderMetaUtil;
 import nc.scmmm.pub.scmpub.report.scale.SCMRptAbsScalePrcStrategy;
 import nc.scmmm.pub.scmpub.report.smart.templet.SimpleAbsRptDataSetTemplet;
 import nc.scmmm.vo.scmpub.report.entity.SCMRptDataSet;
+import nc.scmmm.vo.scmpub.report.entity.metadata.SCMField;
 import nc.scmmm.vo.scmpub.report.entity.metadata.SCMProviderMetaData;
 import nc.scmmm.vo.scmpub.report.viewfactory.define.SCMView;
+import nc.vo.ct.purdaily.entity.CtPuVO;
 import nc.vo.pub.BusinessException;
+import nc.vo.pub.query.ConditionVO;
+
+import org.apache.commons.lang.StringUtils;
 
 public class FBPuCtRptTemplate  extends SimpleAbsRptDataSetTemplet{
+		private FBPuCtView view =null;  
+		// 来自查询对话框的查询条件vo
+	  public List<ConditionVO> condsFromQryDlgList;
+	
 	  private void addHeadFields(SCMProviderMetaData metaData) {
-		    SCMProviderMetaUtil.getSCMProviderMetaData(metaData,
-		        new OrderHeaderVO().getMetaData(), ExecPriceConstant.HEAD_META);
-		    ExecPriceFieldPreference[] headFields = ExecPriceConstant.SMART_HEAD_SELDEF;
-		    this.createFields(metaData, headFields);
-		  }
-	  private void addBodyFields(SCMProviderMetaData metaData) {
-		    SCMProviderMetaUtil.getSCMProviderMetaData(metaData,
-		        new OrderItemVO().getMetaData(), ExecPriceConstant.BODY_META);
-		    ExecPriceFieldPreference[] bodyFields = ExecPriceConstant.SMART_BODY_SELDEF;
-		    this.createFields(metaData, bodyFields);
+		    this.createFields(metaData,  FBPuCtRptConstant.SMART_FIELDS_ZBCT);
+		    this.createFields(metaData,  FBPuCtRptConstant.SMART_FIELDS_FBCT);
+		    this.createFields(metaData,  FBPuCtRptConstant.SMART_FIELDS_NMNY);
+	  	}
+	  private void createFields(SCMProviderMetaData metaData,
+			  FBPuCtRptFieldPreference[] fields) {
+		    for (FBPuCtRptFieldPreference field : fields) {
+		      SCMField scmfiled =
+		          SCMProviderMetaUtil.getDynamicField(field.getFieldname(),
+		              field.getFieldChnName(), field.getFieldType());
+		      metaData.addField(scmfiled);
+		    }
 		  }
 	@Override
 	protected SCMProviderMetaData getSCMRptMetaData() throws BusinessException {
 	    SCMProviderMetaData metaData = new SCMProviderMetaData();
 	    this.addHeadFields(metaData);
-	    this.addBodyFields(metaData);
 	    return metaData;
 	  }
 
 	@Override
 	protected SCMView getSCMView() {
 	    if (!this.getScmQueryCondition().isHaveCondition()) {
-	        ExecPriceRptView initView =
-	            new ExecPriceRptView(this.getScmReportContext());
+	    	FBPuCtView initView =
+	            new FBPuCtView(this.getScmReportContext());
 	        initView.initDetails();
 	        return initView;
 	      }
@@ -57,7 +75,10 @@ public class FBPuCtRptTemplate  extends SimpleAbsRptDataSetTemplet{
 //	      }
 //	      this.view =
 //	          new ExecPriceRptView(this.getScmReportContext(), this.billsrc, true);
-//	      this.processWhere();
+	    this.view =
+	    		new FBPuCtView(this.getScmReportContext());
+	    this.view.initDetails();
+	    this.processWhere();
 //
 //	      this.view.initSelectDetails(this.headalias, this.bodyalias, this.pricetype);
 //
@@ -67,10 +88,155 @@ public class FBPuCtRptTemplate  extends SimpleAbsRptDataSetTemplet{
 //	      this.view.setPatchGroup(patchGroup);
 //	      this.processInnerJoin();
 //	      return this.view;
-		
-		return null;
+		return this.view;
 	    }
 
+	  private void processWhere() {
+	    ConditionVO[] generalConds = this.getScmQueryCondition().getAllQueryConditions();
+	    StringBuilder where = new StringBuilder();
+	    this.transQryConds(generalConds, where);
+	    String sql =
+	        new ConditionVO().getSQLStr(this.condsFromQryDlgList
+	            .toArray(new ConditionVO[this.condsFromQryDlgList.size()]));
+	    if (StringUtils.isNotBlank(sql)) {
+	      where.append(" and ");
+	      where.append(sql);
+	    }
+	    // 设置默认的查询条件
+//	    where.append(this.getDefaultWhere());
+	    this.view.setPatchWhere(where.toString());
+	    this.view.addWherePart(where.toString());
+	  }
+	  private void transQryConds(ConditionVO[] generalConds, StringBuilder where) {
+		    this.condsFromQryDlgList = new ArrayList<ConditionVO>();
+		    for (ConditionVO condvo : generalConds) {
+		      // 填报主题
+		      if (condvo.getFieldCode().equals(FBPuCtRptFieldConstant.CTBZT)) {
+		          condvo.setFieldCode("ct_pu.pk_org");
+		        this.condsFromQryDlgList.add(condvo);
+		      }
+		      // 采购合同编码
+		      else if (condvo.getFieldCode().equals(CtPuVO.VBILLCODE)) {
+		        condvo.setFieldCode("ct_pu.vbillcode");
+		        this.condsFromQryDlgList.add(condvo);
+		      }
+		      // 采购合同名称
+		      else if (condvo.getFieldCode().equals(CtPuVO.CTNAME)) {
+		        if (condvo.getOperaCode().equals("=")) {
+		          where.append(" and ct_pu.ctname = '"
+		              + condvo.getValue() + "'  ");
+		        }
+		        else if (condvo.getOperaCode().contains("left like")) {
+		          where.append(" and  ct_pu.cname left like  '"
+		              + condvo.getValue() + "%' ");
+		        }
+		      }
+//		      // 总包合同签订日期
+//		      else if (condvo.getFieldCode().equals(ExecPriceQueryConst.MATERIALCODE)) {
+//		        condvo.setFieldCode(this.bodyalias + "."
+//		            + ExecPriceDispData.PK_MATERIAL);
+//		        this.condsFromQryDlgList.add(condvo);
+//		      }
+//		      // 
+//		      else if (condvo.getFieldCode().equals(ExecPriceQueryConst.MATERIALNAME)) {
+//		        if (condvo.getOperaCode().equals("in")) {
+//		          where.append(" and bd_material.name in " + condvo.getValue() + "");
+//		        }
+//		        else if (condvo.getOperaCode().equals("=")) {
+//		          where.append(" and bd_material.name = '"
+//		              + SCMESAPI.sqlEncodeGeneral(condvo.getValue()) + "' ");
+//		        }
+//		        else if (condvo.getOperaCode().contains("left like")) {
+//		          where.append(" and bd_material.name like '"
+//		              + SCMESAPI.sqlEncodeGeneral(condvo.getValue()) + "%' ");
+//		        }
+//		        continue;
+//		      }
+//		      // 分析区间:非其他
+//		      else if (condvo.getFieldCode().equals(ExecPriceQueryConst.ANALYAREA)
+//		          && !condvo.getValue().equals(
+//		              String.valueOf(ExecPricePeriodTypeEnum.OTHER))) {
+//		        this.analyArea = Integer.valueOf(condvo.getValue()).intValue();
+//		      } // 分析区间：其他
+//		      else if (condvo.getFieldCode().equals(ExecPriceQueryConst.ANALYAREA)
+//		          && condvo.getValue().equals(
+//		              String.valueOf(ExecPricePeriodTypeEnum.OTHER))) {
+//		        for (ConditionVO innerConVO : generalConds) {
+//		          if (innerConVO.getFieldCode().equals(ExecPriceQueryConst.DAYS)) {
+//		            this.analyArea =
+//		                Integer.valueOf("33" + innerConVO.getValue()).intValue();
+//		          }
+//		        }
+//		      }
+//		      // 天数
+//		      else if (condvo.getFieldCode().equals(ExecPriceQueryConst.DAYS)
+//		          && condvo.getValue().equals(
+//		              String.valueOf(ExecPricePeriodTypeEnum.OTHER))) {
+//		      }
+//		      // 价格取值
+//		      else if (condvo.getFieldCode().equals(ExecPriceQueryConst.PRICETYPE)) {
+//		        this.pricetype = Integer.valueOf(condvo.getValue()).intValue();
+//		        // // 含税, 原币价税合计非负
+//		        // if (this.pricetype == StockExecPriceTypeEnum.TAX) {
+//		        // where.append("and not( coalesce(" + this.bodyalias + "."
+//		        // + StockExecConstant.NORIGTAXMNY + ",0) < 0) ");
+//		        // }
+//		        // // 不含税, 原币无税金额非负
+//		        // else if (this.pricetype == StockExecPriceTypeEnum.UNTAX) {
+//		        // where.append("and not( coalesce(" + this.bodyalias + "."
+//		        // + StockExecConstant.NORIGMNY + ",0) < 0) ");
+//		        // }
+//		      }
+//
+		      // 单据日期
+		      else if (condvo.getFieldCode().equals(CtPuVO.DBILLDATE)) {
+//		        String[] dates = condvo.getValue().split(",");
+//		        this.beginDate = new UFDate(dates[0]);
+//		        this.endDate = new UFDate(dates[1]);
+////
+//		        String filedcode = condvo.getFieldCode();
+////		        condvo.setFieldCode(this.headalias + "." + filedcode);
+		        this.condsFromQryDlgList.add(condvo);
+		      }
+		      // 总包合同编码
+		      else if (condvo.getFieldCode().equals("zbvbillcode")) {
+		        if (condvo.getOperaCode().equals("=")) {
+			          where.append(" and ( ct_pu.vdef5 = '"
+			              + condvo.getValue() + "' or ct_pu.vdef15 = '"
+			              + condvo.getValue() + "' ) ");
+			        } 
+			        else if (condvo.getOperaCode().contains("left like")) {
+			          where.append(" and ( ct_pu.vdef5 left like '"
+				              + condvo.getValue() + "%' or ct_pu.vdef15 left like  '"
+				              + condvo.getValue() + "%' ) ");
+				        }
+			      }
+		      // 采购合同签订日期
+		      else if (condvo.getFieldCode().equals("fbctqddate")) {
+		        condvo.setFieldCode("ct_pu." + CtPuVO.SUBSCRIBEDATE);
+		        this.condsFromQryDlgList.add(condvo);
+		      }
+//		      // 表头：采购组织、采购部门、业务流程、币种、单据日期
+//		      else if (condvo.getFieldCode().equals(ExecPriceQueryConst.PK_ORG)
+//		          || condvo.getFieldCode().equals(ExecPriceQueryConst.PK_DEPT)
+//		          || condvo.getFieldCode().equals(ExecPriceQueryConst.PK_BUSITYPE)
+//		          || condvo.getFieldCode().equals(ExecPriceQueryConst.CORIGCURRENCYID)) {
+//		        String filedcode = condvo.getFieldCode();
+//		        condvo.setFieldCode(this.headalias + "." + filedcode);
+//		        this.condsFromQryDlgList.add(condvo);
+//		      }
+//		      // 供应商
+		      else if (condvo.getFieldCode().equals(CtPuVO.CVENDORID)) {
+//		        String filedcode = condvo.getFieldCode();
+//		        condvo.setFieldCode(this.bodyalias + "." + filedcode);
+		        this.condsFromQryDlgList.add(condvo);
+//		      }
+		    }
+		    }
+		  }
+	  
+	  
+	  
 	@Override
 	protected boolean isAddRowIndex() {
 		return false;
