@@ -8,7 +8,7 @@ import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldPreference;
 import nc.vo.pub.JavaType;
 
-public class FBPuCtRptTempTable extends AbstractTempTab {
+public class FBPuCtRptTempTable extends FBPuCtRptAbstractTempTable {
 	public FBPuCtRptTempTable(String tabname) {
 		super(tabname, getFieldnames(), getFieldSqlTypes(), getFieldJavaTypes());
 	}

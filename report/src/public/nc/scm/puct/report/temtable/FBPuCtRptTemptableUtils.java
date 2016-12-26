@@ -7,7 +7,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class FBPuCtRptTemptableUtils{
 	  /** 创建临时表并填充数据 */
-	  private static FBPuCtRptTempTable createTempTab(Object[][] objs,String tabname) {
+	  public static FBPuCtRptTempTable createTempTab(Object[][] objs,String tabname) {
 		  FBPuCtRptTempTable temp = new FBPuCtRptTempTable(tabname);
 	    temp.setAlias(tabname);
 	    temp.insertData(objs);
@@ -24,10 +24,5 @@ public class FBPuCtRptTemptableUtils{
 	      return rs.toTwoDimensionStringArray();
 	    }
 	    return null;
-	  }
-	  
-
-	  public FBPuCtRptTempTable getQryMatInHidTempTab(Object[][] objs,String tabname) {
-	    return FBPuCtRptTemptableUtils.createTempTab(objs,tabname);
 	  }
 	}

@@ -7,8 +7,8 @@ public class FBPuCtRptFieldConstant {
 	public static final String CTBZT =CtPuVO.PK_ORG;
 	  //“项目pk"
 	public static final String CPROJECTID=CtPuVO.CPROJECTID;
-	//“项目编码"
-	public static final String CPROJECTCODE="cprojectcode";
+//	//“项目编码"
+//	public static final String CPROJECTCODE="cprojectcode";
 
 
 	//收款合同pk
@@ -211,5 +211,6 @@ public class FBPuCtRptFieldConstant {
 	public static final String NINVOICEMNY_12="ninvoicemny_12";
 	//“付款金额"
 	public static final String NPAYMENTMNY_12="npaymentmny_12";
-
+	
+	
 }

@@ -289,12 +289,8 @@ public class FBPuCtRptTemplate  extends SimpleAbsRptDataSetTemplet{
 	 */
 	private void processMny(SCMRptDataSet dataset,Map<String,FBPuCtRptVO> vomap,String data){
 		FBPuCtRptTemptableUtils.createTempTab(dataset.getDatas(), FBPuCtRptConstant.TEM_FBPUCT_ALLCT);
-		String sql = this.view.getViewSql();
-		String newsql = sql.substring(0, sql.indexOf("where"));
 		StringBuffer sb = new StringBuffer("");
-		sb.append(newsql);
-		sb.append(" , "+FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
-		sb.append(" where  ");
+		sb.append(" select   ");
 		sb.append(" ( ");
 		
 		//---总包合同为销售合同或者收款合同，且销售合同或收款合同不能同时为空----start--------------
@@ -326,7 +322,6 @@ public class FBPuCtRptTemplate  extends SimpleAbsRptDataSetTemplet{
 	    this.queryAllCt(dataset);
 	    Map<String,FBPuCtRptVO> vomap = new HashMap<String,FBPuCtRptVO>();
 	    //处理累计的数据
-	    this.
 //
 //	      List<SCMRptRowData> dataList = new ArrayList<SCMRptRowData>();
 //	      List<SCMRptRowData> nullDataList = new ArrayList<SCMRptRowData>();

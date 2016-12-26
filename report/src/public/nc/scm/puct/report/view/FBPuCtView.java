@@ -1,23 +1,18 @@
 package nc.scm.puct.report.view;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-import nc.pub.pp.rept.execprice.constant.ExecPriceConstant;
-import nc.pub.pp.rept.execprice.enumration.ExecPriceBillSrcEnum;
-import nc.pub.pp.rept.execprice.view.SqlObject;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldConstant;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldPreference;
-import nc.scmmm.pub.scmpub.report.baseutil.SCMStringUtil;
 import nc.scmmm.vo.scmpub.report.pub.ISCMReportContext;
 import nc.scmmm.vo.scmpub.report.viewfactory.sql.PermissionTableInfo;
 import nc.scmmm.vo.scmpub.report.viewfactory.sql.SCMBeanPath;
 import nc.scmmm.vo.scmpub.report.viewfactory.sql.SCMPermissionBeanSqlView;
 import nc.vo.ct.purdaily.entity.CtPuVO;
-import nc.vo.pp.util.StringUtils;
-import nc.vo.pu.m21.entity.OrderItemVO;
 import nc.vo.pub.JavaType;
-import nc.vo.to.m4552.view.PuInvoiceViewVO;
 
 public class FBPuCtView extends SCMPermissionBeanSqlView {
 
@@ -138,9 +133,12 @@ public class FBPuCtView extends SCMPermissionBeanSqlView {
 	  }
 
 	  public void initDetails() {
-		  String[] ctnames = new String[]{FBPuCtRptFieldConstant.CTBZT,FBPuCtRptFieldConstant.CPROJECTID,FBPuCtRptFieldConstant.PK_ZBHT_SK,FBPuCtRptFieldConstant.PK_ZBHT_CODE_SK,FBPuCtRptFieldConstant.PK_ZBHT_XS,FBPuCtRptFieldConstant.PK_ZBHT_CODE_XS};
-	    this.addSelectFields(SCMBeanPath.DOT, ctnames,ctnames);
-	    this.addSelDefineFields(new FBPuCtRptFieldPreference[]{new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CPROJECTCODE,FBPuCtRptFieldConstant.CPROJECTCODE,JavaType.String,FBPuCtRptConstant.SQLTYPE_DOUBLE)});
+		  List<String> ctnames =new ArrayList<String>();
+		  for(FBPuCtRptFieldPreference field:FBPuCtRptConstant.SMART_FIELDS_ZBCT){
+				  ctnames.add(field.getFieldname());
+		  }
+	    this.addSelectFields(SCMBeanPath.DOT, ctnames.toArray(new String[0]),ctnames.toArray(new String[0]));
+	    this.addSelDefineFields(FBPuCtRptConstant.SMART_FIELDS_ADD);
 	    this.addSelDefineFields(FBPuCtRptConstant.SMART_FIELDS_FBCT);
 	    this.addSelDefineFields(FBPuCtRptConstant.SMART_FIELDS_NMNY);
 	  }
@@ -148,12 +146,13 @@ public class FBPuCtView extends SCMPermissionBeanSqlView {
 	  private void addSelDefineFields(FBPuCtRptFieldPreference[] fields) {
 		    for (FBPuCtRptFieldPreference field : fields) {
 		      if (JavaType.String.equals(field.getFieldType())) {
-		        this.addExpress( null , field.getFieldname(), JavaType.String);
+		        this.addExpress( "null" , field.getFieldname(), JavaType.String);
 		      }
-		      else if (JavaType.UFDouble.equals(field.getFieldType())
-		          || JavaType.Integer.equals(field.getFieldType())) {
-		        this.addExpress("", field.getFieldname(), field.getFieldType());
-		      }else {
+//		      else if (JavaType.UFDouble.equals(field.getFieldType())
+//		          || JavaType.Integer.equals(field.getFieldType())) {
+//		        this.addExpress("", field.getFieldname(), field.getFieldType());
+//		      }
+		      else {
 			    this.addExpress("null", field.getFieldname(), field.getFieldType());
 		      }
 		    }

@@ -16,7 +16,7 @@ public class FBPuCtRptConstant {
 	  public final static String LEFT_JOIN_PAYITEM =" left join ap_payitem        on ap_payitem.top_billid 	= ap_payableitem.pk_payablebill ";
 	  
 	  //Í³¼Æ×Ö¶Î
-	  public final static String SELECT_MNY_IN =" ic_purchasein_b.nmny , ic_purchasein_b.ntaxmny,ic_purchasein_h.dbilldate ";
+	  public final static String SELECT_MNY_IN =" ic_purchasein_b.nmny , ic_purchasein_b.ntaxmny ";
 	  public final static String SELECT_MNYS_INVOICE =" po_invoice_b.pk_invoice ,po_invoice_b.pk_invoice_b  ";
 	  public final static String SELECT_MNY_PAYITEM =" ap_payitem.pk_paybill ,ap_payitem.pk_payitem ";
 	  
