@@ -5,16 +5,39 @@ import nc.vo.pub.JavaType;
 public class FBPuCtRptConstant {
 	  public final static String SQLTYPE_DOUBLE ="number(28,8)";
 	  public final static String SQLTYPE_STRING ="varchar2(200)";
+	  public final static String TEM_FBPUCT_FROM_CONDITIONS ="tem_fbpuct_from_conditions";
+	  
+	  //左连接sql
+	  public final static String LEFT_JOIN_ORDER =" left join po_order_b  on po_order_b.csourceid   = ct_pu.pk_ct_pu ";
+	  public final static String LEFT_JOIN_ARRIVE =" left join po_arriveorder_b  on po_arriveorder_b.csourceid = po_order_b.pk_order ";
+	  public final static String LEFT_JOIN_IN =" left join ic_purchasein_b  on ic_purchasein_b.csourcebillhid = po_arriveorder_b.pk_arriveorder ";
+	  public final static String LEFT_JOIN_INVOICE =" left join po_invoice_b  on (po_invoice_b.csourceid = ic_purchasein_b.cgeneralhid	or   po_invoice_b.csourceid = po_order_b.pk_order ) ";
+	  public final static String LEFT_JOIN_PAYABLEITEM =" left join ap_payableitem    on ap_payableitem.top_billid   = po_invoice_b.pk_invoice ";
+	  public final static String LEFT_JOIN_PAYITEM =" left join ap_payitem        on ap_payitem.top_billid 	= ap_payableitem.pk_payablebill ";
+	  
+	  //统计字段
+	  public final static String SELECT_MNY_IN =" ic_purchasein_b.nmny , ic_purchasein_b.ntaxmny,ic_purchasein_h.dbilldate ";
+	  public final static String SELECT_MNYS_INVOICE =" po_invoice_b.pk_invoice ,po_invoice_b.pk_invoice_b  ";
+	  public final static String SELECT_MNY_PAYITEM =" ap_payitem.pk_paybill ,ap_payitem.pk_payitem ";
+	  
+	  public final static String SELECT_FIELDS_ORDER =" po_order_b.pk_order,po_order_b.pk_order_b  ";
+	  public final static String SELECT_FIELDS_ARRIVE =" po_arriveorder_b.pk_arriveorder_b , po_arriveorder_b.pk_arriveorder ";
+	  public final static String SELECT_FIELDS_IN =" ic_purchasein_b.cgeneralhid ,ic_purchasein_b.cgeneralbid ";
+	  public final static String SELECT_FIELDS_INVOICE =" po_invoice_b.pk_invoice ,po_invoice_b.pk_invoice_b  ";
+	  public final static String SELECT_FIELDS_PAYABLEITEM =" ap_payableitem.pk_payablebill  ,ap_payableitem.pk_payableitem ";
+	  public final static String SELECT_FIELDS_PAYITEM =" ap_payitem.pk_paybill ,ap_payitem.pk_payitem ";
+	  
+	  
+	  
+	  /**根据总包合同查询出了所有的子合同，但是没有统计数据**/
+	  public final static String TEM_FBPUCT_ALLCT ="tem_fbpuct_allct";
+	  public final static String CT_PU ="ct_pu";
 	  /** 表体显示字段 - 语义模型 - 自定义字段 */
 	  public static final FBPuCtRptFieldPreference[] SMART_FIELDS_ZBCT =
 	      new FBPuCtRptFieldPreference[] {
-//	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.PK_SUPPLIER,"", JavaType.String),
-//	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.PK_SUPPLIER,"", JavaType.Integer),
-//	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.PK_SUPPLIER,"", JavaType.UFDouble),
-		  //	
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CTBZT,"填报主体", JavaType.String,SQLTYPE_STRING),
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CPROJECTID,"项目pk", JavaType.String,SQLTYPE_STRING),
-	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CPROJECTCODE,"项目编码", JavaType.String,SQLTYPE_STRING),
+//	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CPROJECTCODE,"项目编码", JavaType.String,SQLTYPE_STRING),
 	        
 	        //总包合同信息
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.PK_ZBHT_XS,"合同pk", JavaType.String,SQLTYPE_STRING),
@@ -30,7 +53,7 @@ public class FBPuCtRptConstant {
 	        //采购合同的含税金额
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.NHTMNY,"合同金额", JavaType.UFDouble,SQLTYPE_DOUBLE),
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.DSIGN,"合同签订日期", JavaType.UFDate,SQLTYPE_STRING),
-	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.VERSION,"合同签订日期", JavaType.UFDouble,SQLTYPE_DOUBLE),
+	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.VERSION,"合同版本", JavaType.UFDouble,SQLTYPE_DOUBLE),
 	      };
 	  /** 表体显示字段 - 语义模型 - 自定义字段 */
 	  public static final FBPuCtRptFieldPreference[] SMART_FIELDS_FBCT =
