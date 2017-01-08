@@ -7,6 +7,7 @@ import java.util.Set;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldConstant;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldPreference;
+import nc.scmmm.pub.scmpub.report.baseutil.SCMStringUtil;
 import nc.scmmm.vo.scmpub.report.pub.ISCMReportContext;
 import nc.scmmm.vo.scmpub.report.viewfactory.sql.PermissionTableInfo;
 import nc.scmmm.vo.scmpub.report.viewfactory.sql.SCMBeanPath;
@@ -18,6 +19,15 @@ public class FBPuCtView extends SCMPermissionBeanSqlView {
 
 	private static final long serialVersionUID = -5633594163847083267L;
 	private String patchWhere = "";
+	public boolean isHas_body_condition() {
+		return has_body_condition;
+	}
+
+	public void setHas_body_condition(boolean has_body_condition) {
+		this.has_body_condition = has_body_condition;
+	}
+
+	private boolean has_body_condition =false;
 	public FBPuCtView(
 	      ISCMReportContext context) {
 	    super(new CtPuVO(), context);
@@ -38,12 +48,29 @@ public class FBPuCtView extends SCMPermissionBeanSqlView {
 
 	  @Override
 	  public String getViewSql() {
-		  return super.getViewSql();
-//	    if (null == this.sqlObject) {
-//	      return super.getViewSql();
-//	    }
-//	    return this.getViewSqlForFirstQuery();
-	  }
+		    StringBuilder bf = new StringBuilder(" select ");
+		    bf.append(this.getSelectFieldsPart());
+		    bf.append(" from ");
+		    bf.append(this.getViewFromPart());
+		    if(has_body_condition){
+		    	bf.append(" inner join ct_pu_b on ct_pu_b.pk_ct_pu = ct_pu.pk_ct_pu ");
+		    }
+		    bf.append(" where ");
+		    bf.append(this.getViewWherePart());
+		    if (this.isGroup()) {
+		      bf.append(" group by ");
+		      bf.append(this.getGroupFieldsPart());
+		      if (!SCMStringUtil.isSEmptyOrNull(this.getHaving())) {
+		        bf.append(" having ");
+		        bf.append(this.getHaving());
+		      }
+		    }
+		    if (this.isOrder()) {
+		      bf.append(" order by ");
+		      bf.append(this.getOrderFieldsPart());
+		    }
+		    return bf.toString();
+		  }
 
 	  public String getViewSqlForFirstQuery() {
 //	    String headtable = null;

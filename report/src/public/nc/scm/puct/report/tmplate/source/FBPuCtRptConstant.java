@@ -6,6 +6,7 @@ public class FBPuCtRptConstant {
 	  public final static String SQLTYPE_DOUBLE ="number(28,8)";
 	  public final static String SQLTYPE_STRING ="varchar2(200)";
 	  public final static String TEM_FBPUCT_FROM_CONDITIONS ="tem_fbpuct_from_conditions";
+	  public final static String TEM_FBPUCT_FINAL ="tem_fbpuct_final";
 	  
 	  //左连接sql
 	  public final static String LEFT_JOIN_ORDER =" left join po_order_b  on po_order_b.csourceid   = ct_pu.pk_ct_pu ";
@@ -28,6 +29,20 @@ public class FBPuCtRptConstant {
 	  public final static String SELECT_FIELDS_PAYITEM =" ap_payitem.pk_paybill ,ap_payitem.pk_payitem ";
 	  
 	  
+	  //查询采购入库金额
+	  public final static String Sql_query_mny_in_1 =" select  distinct  ct_pu.pk_ct_pu pk_ct_pu , sum(ic_purchasein_b.nmny) nmny ,   sum(ic_purchasein_b.ntaxmny) ntaxmny  from  ct_pu  ";
+	  public final static String Sql_query_mny_in_3 =" left join po_order_b   on po_order_b.csourceid   = ct_pu.pk_ct_pu   left join po_arriveorder_b  on po_arriveorder_b.csourceid = po_order_b.pk_order  left join ic_purchasein_b   on ic_purchasein_b.csourcebillhid = po_arriveorder_b.pk_arriveorder   left join ic_purchasein_h on ic_purchasein_h.cgeneralhid = ic_purchasein_b.cgeneralhid   " ;
+	  
+	  //查询已收发票金额
+	  public final static String Sql_query_mny_invoice_1 =" select  distinct  ct_pu.pk_ct_pu pk_ct_pu ,   sum(po_invoice_b.nmny) nmny ,  sum(po_invoice_b.ntaxmny)  ntaxmny   from  ct_pu  ";
+	  public final static String Sql_query_mny_invoice_3 =" left join po_order_b   on po_order_b.csourceid   = ct_pu.pk_ct_pu   left join po_arriveorder_b  on po_arriveorder_b.csourceid = po_order_b.pk_order  left join ic_purchasein_b   on ic_purchasein_b.csourcebillhid = po_arriveorder_b.pk_arriveorder   left join po_invoice_b      on (po_invoice_b.csourceid = ic_purchasein_b.cgeneralhid    or   po_invoice_b.csourceid = po_order_b.pk_order )  left join po_invoice on po_invoice.pk_invoice = po_invoice_b.pk_invoice   " ;
+	  
+	  //查询付款金额
+	  public final static String Sql_query_mny_pay_1 =" select  distinct  ct_pu.pk_ct_pu pk_ct_pu ,  sum(ap_payitem.local_notax_de) nmny , sum(ap_payitem.local_money_de ) ntaxmny   from  ct_pu  ";
+	  public final static String Sql_query_mny_pay_3 =" left join po_order_b   on po_order_b.csourceid   = ct_pu.pk_ct_pu   left join po_arriveorder_b  on po_arriveorder_b.csourceid = po_order_b.pk_order  left join ic_purchasein_b   on ic_purchasein_b.csourcebillhid = po_arriveorder_b.pk_arriveorder   left join po_invoice_b      on (po_invoice_b.csourceid = ic_purchasein_b.cgeneralhid    or   po_invoice_b.csourceid = po_order_b.pk_order )  left join ap_payableitem    on ap_payableitem.top_billid   = po_invoice_b.pk_invoice left join ap_payitem   on ap_payitem.top_billid = ap_payableitem.pk_payablebill  left join ap_paybill on ap_paybill.pk_paybill = ap_payitem.pk_paybill  " ;
+	  
+	  //分组条件
+	  public final static String Sql_group_by = "  group by ct_pu.pk_ct_pu  " ;
 	  
 	  /**根据总包合同查询出了所有的子合同，但是没有统计数据**/
 	  public final static String TEM_FBPUCT_ALLCT ="tem_fbpuct_allct";

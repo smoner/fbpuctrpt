@@ -696,5 +696,302 @@ public class FBPuCtRptVO {
 	public void setNpaymentmny_12(String npaymentmny_12) {
 		this.npaymentmny_12 = npaymentmny_12;
 	}
+	
+//	//“验收入库/进度金额"
+//		private  String ninmny_all=null;
+//		//“合同进度"
+//		private  String nrate_all=null;
+//		//“已收发票金额"
+//		private  String ninvoicemny_all=null;
+//		//“付款金额"
+//		private  String npaymentmny_all=null;
+	
+	//根据字段名称获取值
+	public String getValue(String name){
+		if(FBPuCtRptFieldConstant.NINMNY_ALL.equals(name)){
+			return this.getNinmny_all();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_ALL.equals(name)){
+			return this.getNinvoicemny_all();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_ALL.equals(name)){
+			return this.getNpaymentmny_all();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_.equals(name)){
+			return this.getNinmny_();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_.equals(name)){
+			return this.getNinvoicemny_();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_.equals(name)){
+			return this.getNpaymentmny_();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_1.equals(name)){
+			return this.getNinmny_1();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_1.equals(name)){
+			return this.getNinvoicemny_1();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_1.equals(name)){
+			return this.getNpaymentmny_1();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_2.equals(name)){
+			return this.getNinmny_2();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_2.equals(name)){
+			return this.getNinvoicemny_2();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_2.equals(name)){
+			return this.getNpaymentmny_2();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_3.equals(name)){
+			return this.getNinmny_3();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_3.equals(name)){
+			return this.getNinvoicemny_3();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_3.equals(name)){
+			return this.getNpaymentmny_3();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_4.equals(name)){
+			return this.getNinmny_4();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_4.equals(name)){
+			return this.getNinvoicemny_4();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_4.equals(name)){
+			return this.getNpaymentmny_4();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_5.equals(name)){
+			return this.getNinmny_5();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_5.equals(name)){
+			return this.getNinvoicemny_5();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_5.equals(name)){
+			return this.getNpaymentmny_5();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_6.equals(name)){
+			return this.getNinmny_6();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_6.equals(name)){
+			return this.getNinvoicemny_6();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_6.equals(name)){
+			return this.getNpaymentmny_6();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_7.equals(name)){
+			return this.getNinmny_7();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_7.equals(name)){
+			return this.getNinvoicemny_7();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_7.equals(name)){
+			return this.getNpaymentmny_7();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_8.equals(name)){
+			return this.getNinmny_8();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_8.equals(name)){
+			return this.getNinvoicemny_8();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_8.equals(name)){
+			return this.getNpaymentmny_8();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_9.equals(name)){
+			return this.getNinmny_9();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_9.equals(name)){
+			return this.getNinvoicemny_9();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_9.equals(name)){
+			return this.getNpaymentmny_9();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_10.equals(name)){
+			return this.getNinmny_10();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_10.equals(name)){
+			return this.getNinvoicemny_10();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_10.equals(name)){
+			return this.getNpaymentmny_10();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_11.equals(name)){
+			return this.getNinmny_11();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_11.equals(name)){
+			return this.getNinvoicemny_11();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_11.equals(name)){
+			return this.getNpaymentmny_11();
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_12.equals(name)){
+			return this.getNinmny_12();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_12.equals(name)){
+			return this.getNinvoicemny_12();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_12.equals(name)){
+			return this.getNpaymentmny_12();
+		}
+		
+		return null;
+	}
+	//根据字段名称获取值
+	public void setValue(String name,String value){
+		if(FBPuCtRptFieldConstant.NINMNY_ALL.equals(name)){
+			 this.setNinmny_all(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_ALL.equals(name)){
+			 this.setNinvoicemny_all(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_ALL.equals(name)){
+			 this.setNpaymentmny_all(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_.equals(name)){
+			 this.setNinmny_(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_.equals(name)){
+			 this.setNinvoicemny_(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_.equals(name)){
+			 this.setNpaymentmny_(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_1.equals(name)){
+			 this.setNinmny_1(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_1.equals(name)){
+			 this.setNinvoicemny_1(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_1.equals(name)){
+			 this.setNpaymentmny_1(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_2.equals(name)){
+			 this.setNinmny_2(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_2.equals(name)){
+			 this.setNinvoicemny_2(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_2.equals(name)){
+			 this.setNpaymentmny_2(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_3.equals(name)){
+			 this.setNinmny_3(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_3.equals(name)){
+			 this.setNinvoicemny_3(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_3.equals(name)){
+			 this.setNpaymentmny_3(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_4.equals(name)){
+			 this.setNinmny_4(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_4.equals(name)){
+			 this.setNinvoicemny_4(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_4.equals(name)){
+			 this.setNpaymentmny_4(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_5.equals(name)){
+			 this.setNinmny_5(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_5.equals(name)){
+			 this.setNinvoicemny_5(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_5.equals(name)){
+			 this.setNpaymentmny_5(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_6.equals(name)){
+			 this.setNinmny_6(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_6.equals(name)){
+			 this.setNinvoicemny_6(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_6.equals(name)){
+			 this.setNpaymentmny_6(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_7.equals(name)){
+			 this.setNinmny_7(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_7.equals(name)){
+			 this.setNinvoicemny_7(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_7.equals(name)){
+			 this.setNpaymentmny_7(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_8.equals(name)){
+			 this.setNinmny_8(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_8.equals(name)){
+			 this.setNinvoicemny_8(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_8.equals(name)){
+			 this.setNpaymentmny_8(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_9.equals(name)){
+			 this.setNinmny_9(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_9.equals(name)){
+			 this.setNinvoicemny_9(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_9.equals(name)){
+			 this.setNpaymentmny_9(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_10.equals(name)){
+			 this.setNinmny_10(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_10.equals(name)){
+			 this.setNinvoicemny_10(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_10.equals(name)){
+			 this.setNpaymentmny_10(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_11.equals(name)){
+			 this.setNinmny_11(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_11.equals(name)){
+			 this.setNinvoicemny_11(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_11.equals(name)){
+			 this.setNpaymentmny_11(value);
+		}
+		
+		if(FBPuCtRptFieldConstant.NINMNY_12.equals(name)){
+			 this.setNinmny_12(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_12.equals(name)){
+			 this.setNinvoicemny_12(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_12.equals(name)){
+			 this.setNpaymentmny_12(value);
+		}
+		
+	}
 
 }
