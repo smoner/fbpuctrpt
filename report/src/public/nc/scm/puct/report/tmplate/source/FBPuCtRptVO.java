@@ -718,6 +718,16 @@ public class FBPuCtRptVO {
 			return this.getNpaymentmny_all();
 		}
 		
+		if(FBPuCtRptFieldConstant.NINMNY_LY.equals(name)){
+			return this.getNinmny_ly();
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_LY.equals(name)){
+			return this.getNinvoicemny_ly();
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_LY.equals(name)){
+			return this.getNpaymentmny_ly();
+		}
+		
 		if(FBPuCtRptFieldConstant.NINMNY_.equals(name)){
 			return this.getNinmny_();
 		}
@@ -870,6 +880,15 @@ public class FBPuCtRptVO {
 		}
 		if(FBPuCtRptFieldConstant.NPAYMENTMNY_.equals(name)){
 			 this.setNpaymentmny_(value);
+		}
+		if(FBPuCtRptFieldConstant.NINMNY_LY.equals(name)){
+			this.setNinmny_ly(value);
+		}
+		if(FBPuCtRptFieldConstant.NINVOICEMNY_LY.equals(name)){
+			this.setNinvoicemny_ly(value);
+		}
+		if(FBPuCtRptFieldConstant.NPAYMENTMNY_LY.equals(name)){
+			this.setNpaymentmny_ly(value);
 		}
 		
 		if(FBPuCtRptFieldConstant.NINMNY_1.equals(name)){

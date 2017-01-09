@@ -16,7 +16,6 @@ import nc.vo.ct.purdaily.entity.CtPuVO;
 import nc.vo.pub.JavaType;
 
 public class FBPuCtView extends SCMPermissionBeanSqlView {
-
 	private static final long serialVersionUID = -5633594163847083267L;
 	private String patchWhere = "";
 	public boolean isHas_body_condition() {

@@ -259,12 +259,34 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 			}
 		}
 	}
-
+	
+	
+	
 	@Override
 	protected boolean isAddRowIndex() {
 		return false;
 	}
-
+	private void createPkTempTables(){
+		//创建合同主键和采购入库单表体主键的临时表
+		DataAccessUtils querytool = new DataAccessUtils();
+		StringBuffer insql = new StringBuffer("");
+		insql.append(" select distinct tem_fbpuct_allct.pk_ct_pu pk_ct_pu, ic_purchasein_b.cgeneralbid  from  tem_fbpuct_allct   left join po_order_b on po_order_b.csourceid = tem_fbpuct_allct.pk_ct_pu  left join po_arriveorder_b  on po_arriveorder_b.csourceid = po_order_b.pk_order  left join ic_purchasein_b  on ic_purchasein_b.csourcebillhid =  po_arriveorder_b.pk_arriveorder where ic_purchasein_b.cgeneralbid is not null and ic_purchasein_b.dr = 0 ");
+		IRowSet is = querytool.query(insql.toString());
+		String[][] inarrs = is.toTwoDimensionStringArray();
+		FBPuCtRptTemptableUtils.createPkTempTab(inarrs, FBPuCtRptConstant.TEM_FBPUCT_IN);
+		//创建合同主键和采购发票表体主键的临时表
+		StringBuffer invoicesql = new StringBuffer("");
+		invoicesql.append(" select distinct tem_fbpuct_allct.pk_ct_pu pk_ct_pu,po_invoice_b.pk_invoice_b   from  tem_fbpuct_allct  left join po_order_b on po_order_b.csourceid = tem_fbpuct_allct.pk_ct_pu  left join po_arriveorder_b   on po_arriveorder_b.csourceid = po_order_b.pk_order left join ic_purchasein_b  on ic_purchasein_b.csourcebillhid =  po_arriveorder_b.pk_arriveorder   left join po_invoice_b  on (   po_invoice_b.csourceid = ic_purchasein_b.cgeneralhid    or po_invoice_b.csourceid = po_order_b.pk_order   ) where po_invoice_b.pk_invoice_b is not null and po_invoice_b.dr = 0 ");
+		IRowSet invoiceis = querytool.query(invoicesql.toString());
+		String[][] invoicearrs = invoiceis.toTwoDimensionStringArray();
+		FBPuCtRptTemptableUtils.createPkTempTab(invoicearrs, FBPuCtRptConstant.TEM_FBPUCT_INVOICE);
+		//创建合同主键和付款单表体主键的临时表
+		StringBuffer paysql = new StringBuffer("");
+		paysql.append(" select distinct tem_fbpuct_allct.pk_ct_pu pk_ct_pu,ap_payitem.pk_payitem   from  tem_fbpuct_allct   left join po_order_b on po_order_b.csourceid = tem_fbpuct_allct.pk_ct_pu  left join po_arriveorder_b   on po_arriveorder_b.csourceid = po_order_b.pk_order   left join ic_purchasein_b   on ic_purchasein_b.csourcebillhid =   po_arriveorder_b.pk_arriveorder   left join po_invoice_b   on (   po_invoice_b.csourceid = ic_purchasein_b.cgeneralhid  or po_invoice_b.csourceid = po_order_b.pk_order  )   left join ap_payableitem  on ap_payableitem.top_billid = po_invoice_b.pk_invoice  left join ap_payitem  on ap_payitem.top_billid = ap_payableitem.pk_payablebill where ap_payitem.pk_payitem  is not null and ap_payitem.dr = 0 ");
+		IRowSet payis = querytool.query(paysql.toString());
+		String[][] payarrs = payis.toTwoDimensionStringArray();
+		FBPuCtRptTemptableUtils.createPkTempTab(payarrs, FBPuCtRptConstant.TEM_FBPUCT_PAY);
+	}
 	/**
 	 * 处理总包合同（销售合同或收款合同），把总包合同下的合同全部查询出来
 	 * 
@@ -316,6 +338,8 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 			Map<String, FBPuCtRptVO> vomap, String data) {
 		FBPuCtRptTemptableUtils.createTempTab(dataset.getDatas(),
 				FBPuCtRptConstant.TEM_FBPUCT_ALLCT);
+		//创建临时表
+		this.createPkTempTables();
 		// 处理累计
 		processMnyByDateAndSuffix(vomap, null, null, "all");
 
@@ -407,16 +431,51 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 
 	/**
 	 * 根据时间段和临时表数据汇总已入库金额
+	 *优化前
+	 * SELECT DISTINCT ct_pu.pk_ct_pu pk_ct_pu, SUM (ic_purchasein_b.nmny) nmny,
+                SUM (ic_purchasein_b.ntaxmny) ntaxmny
+           FROM ct_pu INNER JOIN tem_fbpuct_allct
+                ON ct_pu.pk_ct_pu = tem_fbpuct_allct.pk_ct_pu
+                LEFT JOIN po_order_b ON po_order_b.csourceid = ct_pu.pk_ct_pu
+                LEFT JOIN po_arriveorder_b
+                ON po_arriveorder_b.csourceid = po_order_b.pk_order
+                LEFT JOIN ic_purchasein_b
+                ON ic_purchasein_b.csourcebillhid =
+                                               po_arriveorder_b.pk_arriveorder
+                LEFT JOIN ic_purchasein_h
+                ON ic_purchasein_h.cgeneralhid = ic_purchasein_b.cgeneralhid
+          WHERE 1 = 1
+            AND ic_purchasein_h.dbilldate < '2018-01-01 00:00:00'
+            AND ic_purchasein_h.dbilldate >= '2017-01-01 00:00:00'
+       GROUP BY ct_pu.pk_ct_pu
+	 * 
+	 * 优化后
 	 * */
 	private void processMny_In(Map<String, FBPuCtRptVO> vomap,
 			String date_start, String date_end, String suffix) {
 		String fieldname = FBPuCtRptFieldConstant.NINMNY_ + suffix;
 		StringBuffer sb = new StringBuffer("");
-		sb.append(FBPuCtRptConstant.Sql_query_mny_in_1);
-		sb.append(" inner join  " + FBPuCtRptConstant.TEM_FBPUCT_ALLCT
-				+ " on ct_pu.pk_ct_pu =");
-		sb.append(FBPuCtRptConstant.TEM_FBPUCT_ALLCT + ".pk_ct_pu ");
-		sb.append(FBPuCtRptConstant.Sql_query_mny_in_3);
+		/***------------------------优化前----start---------------------**/
+//		sb.append(FBPuCtRptConstant.Sql_query_mny_in_1);
+//		sb.append(" inner join  " + FBPuCtRptConstant.TEM_FBPUCT_ALLCT
+//				+ " on ct_pu.pk_ct_pu =");
+//		sb.append(FBPuCtRptConstant.TEM_FBPUCT_ALLCT + ".pk_ct_pu ");
+//		sb.append(FBPuCtRptConstant.Sql_query_mny_in_3);
+//		sb.append(" where 1=1 ");
+//		String date = " ic_purchasein_h.dbilldate ";
+//		if (StringUtils.isNotBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and  " + date + " < '" + date_end + "' and " + date
+//					+ " >= '" + date_start + "' ");
+//		} else if (StringUtils.isBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and " + date + "  < '" + date_end + "' ");
+//		}
+//		sb.append(FBPuCtRptConstant.Sql_group_by);
+		/***------------------------优化前----end---------------------**/		
+
+		/***------------------------优化后----start---------------------**/
+		sb.append(" select distinct tem_fbpuct_in.pk_ct_pu pk_ct_pu, sum(ic_purchasein_b.nmny) nmny, sum(ic_purchasein_b.ntaxmny) ntaxmny  from tem_fbpuct_in  inner join ic_purchasein_b on ic_purchasein_b.cgeneralbid = tem_fbpuct_in.bid  inner join ic_purchasein_h  on ic_purchasein_h.cgeneralhid = ic_purchasein_b.cgeneralhid ");
 		sb.append(" where 1=1 ");
 		String date = " ic_purchasein_h.dbilldate ";
 		if (StringUtils.isNotBlank(date_start)
@@ -427,7 +486,8 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 				&& StringUtils.isNotBlank(date_end)) {
 			sb.append(" and " + date + "  < '" + date_end + "' ");
 		}
-		sb.append(FBPuCtRptConstant.Sql_group_by);
+		sb.append(" group by tem_fbpuct_in.pk_ct_pu ");		
+		/***------------------------优化后----start---------------------**/
 		DataAccessUtils querytool = new DataAccessUtils();
 		IRowSet rs = querytool.query(sb.toString());
 		if (rs != null && rs.size() > 0) {
@@ -452,16 +512,57 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 
 	/**
 	 * 根据时间段和临时表数据汇总已收发票金额
+	 * 
+	 * 优化前
+	 * SELECT DISTINCT ct_pu.pk_ct_pu pk_ct_pu, SUM (po_invoice_b.nmny) nmny,
+                SUM (po_invoice_b.ntaxmny) ntaxmny
+           FROM ct_pu INNER JOIN tem_fbpuct_allct
+                ON ct_pu.pk_ct_pu = tem_fbpuct_allct.pk_ct_pu
+                LEFT JOIN po_order_b ON po_order_b.csourceid = ct_pu.pk_ct_pu
+                LEFT JOIN po_arriveorder_b
+                ON po_arriveorder_b.csourceid = po_order_b.pk_order
+                LEFT JOIN ic_purchasein_b
+                ON ic_purchasein_b.csourcebillhid =
+                                               po_arriveorder_b.pk_arriveorder
+                LEFT JOIN po_invoice_b
+                ON (   po_invoice_b.csourceid = ic_purchasein_b.cgeneralhid
+                    OR po_invoice_b.csourceid = po_order_b.pk_order
+                   )
+                LEFT JOIN po_invoice
+                ON po_invoice.pk_invoice = po_invoice_b.pk_invoice
+          WHERE 1 = 1
+            AND po_invoice.dbilldate < '2018-01-01 00:00:00'
+            AND po_invoice.dbilldate >= '2017-01-01 00:00:00'
+       GROUP BY ct_pu.pk_ct_pu
+	 * 
+	 * 优化后
+	 * 
 	 * */
 	private void processMny_Invoice(Map<String, FBPuCtRptVO> vomap,
 			String date_start, String date_end, String suffix) {
 		String fieldname = FBPuCtRptFieldConstant.NINVOICEMNY_ + suffix;
 		StringBuffer sb = new StringBuffer("");
-		sb.append(FBPuCtRptConstant.Sql_query_mny_invoice_1);
-		sb.append(" inner join  " + FBPuCtRptConstant.TEM_FBPUCT_ALLCT
-				+ " on ct_pu.pk_ct_pu =");
-		sb.append(FBPuCtRptConstant.TEM_FBPUCT_ALLCT + ".pk_ct_pu ");
-		sb.append(FBPuCtRptConstant.Sql_query_mny_invoice_3);
+		/***------------------------优化前----start---------------------**/
+//		sb.append(FBPuCtRptConstant.Sql_query_mny_invoice_1);
+//		sb.append(" inner join  " + FBPuCtRptConstant.TEM_FBPUCT_ALLCT
+//				+ " on ct_pu.pk_ct_pu =");
+//		sb.append(FBPuCtRptConstant.TEM_FBPUCT_ALLCT + ".pk_ct_pu ");
+//		sb.append(FBPuCtRptConstant.Sql_query_mny_invoice_3);
+//		sb.append(" where 1=1 ");
+//		String date = " po_invoice.dbilldate ";
+//		if (StringUtils.isNotBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and  " + date + " < '" + date_end + "' and " + date
+//					+ " >= '" + date_start + "' ");
+//		} else if (StringUtils.isBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and " + date + "  < '" + date_end + "' ");
+//		}
+//		sb.append(FBPuCtRptConstant.Sql_group_by);
+		/***------------------------优化前----end---------------------**/	
+		
+		/***------------------------优化后----start---------------------**/	
+		sb.append(" select distinct tem_fbpuct_invoice.pk_ct_pu pk_ct_pu, sum(po_invoice_b.nmny) nmny,  sum(po_invoice_b.ntaxmny) ntaxmny  from tem_fbpuct_invoice  inner join po_invoice_b    on    po_invoice_b.pk_invoice_b = tem_fbpuct_invoice.bid  inner  join po_invoice   on po_invoice.pk_invoice = po_invoice_b.pk_invoice ");
 		sb.append(" where 1=1 ");
 		String date = " po_invoice.dbilldate ";
 		if (StringUtils.isNotBlank(date_start)
@@ -472,7 +573,8 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 				&& StringUtils.isNotBlank(date_end)) {
 			sb.append(" and " + date + "  < '" + date_end + "' ");
 		}
-		sb.append(FBPuCtRptConstant.Sql_group_by);
+		sb.append(" group by tem_fbpuct_invoice.pk_ct_pu ");	
+		/***------------------------优化后----start---------------------**/
 		DataAccessUtils querytool = new DataAccessUtils();
 		IRowSet rs = querytool.query(sb.toString());
 		if (rs != null && rs.size() > 0) {
@@ -497,16 +599,61 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 
 	/**
 	 * 根据时间段和临时表数据汇总付款金额
+	 * 
+	 * 优化前
+	 * SELECT DISTINCT ct_pu.pk_ct_pu pk_ct_pu, SUM (ap_payitem.local_notax_de) nmny,
+                SUM (ap_payitem.local_money_de) ntaxmny
+           FROM ct_pu INNER JOIN tem_fbpuct_allct
+                ON ct_pu.pk_ct_pu = tem_fbpuct_allct.pk_ct_pu
+                LEFT JOIN po_order_b ON po_order_b.csourceid = ct_pu.pk_ct_pu
+                LEFT JOIN po_arriveorder_b
+                ON po_arriveorder_b.csourceid = po_order_b.pk_order
+                LEFT JOIN ic_purchasein_b
+                ON ic_purchasein_b.csourcebillhid =
+                                               po_arriveorder_b.pk_arriveorder
+                LEFT JOIN po_invoice_b
+                ON (   po_invoice_b.csourceid = ic_purchasein_b.cgeneralhid
+                    OR po_invoice_b.csourceid = po_order_b.pk_order
+                   )
+                LEFT JOIN ap_payableitem
+                ON ap_payableitem.top_billid = po_invoice_b.pk_invoice
+                LEFT JOIN ap_payitem
+                ON ap_payitem.top_billid = ap_payableitem.pk_payablebill
+                LEFT JOIN ap_paybill
+                ON ap_paybill.pk_paybill = ap_payitem.pk_paybill
+          WHERE 1 = 1
+            AND ap_paybill.billdate < '2018-01-01 00:00:00'
+            AND ap_paybill.billdate >= '2017-01-01 00:00:00'
+       GROUP BY ct_pu.pk_ct_pu
+	 * 
+	 * 优化后
+	 * 
 	 * */
 	private void processMny_Pay(Map<String, FBPuCtRptVO> vomap,
 			String date_start, String date_end, String suffix) {
 		String fieldname = FBPuCtRptFieldConstant.NPAYMENTMNY_ + suffix;
 		StringBuffer sb = new StringBuffer("");
-		sb.append(FBPuCtRptConstant.Sql_query_mny_pay_1);
-		sb.append(" inner join  " + FBPuCtRptConstant.TEM_FBPUCT_ALLCT
-				+ " on ct_pu.pk_ct_pu =");
-		sb.append(FBPuCtRptConstant.TEM_FBPUCT_ALLCT + ".pk_ct_pu ");
-		sb.append(FBPuCtRptConstant.Sql_query_mny_pay_3);
+		/***------------------------优化前----start---------------------**/
+//		sb.append(FBPuCtRptConstant.Sql_query_mny_pay_1);
+//		sb.append(" inner join  " + FBPuCtRptConstant.TEM_FBPUCT_ALLCT
+//				+ " on ct_pu.pk_ct_pu =");
+//		sb.append(FBPuCtRptConstant.TEM_FBPUCT_ALLCT + ".pk_ct_pu ");
+//		sb.append(FBPuCtRptConstant.Sql_query_mny_pay_3);
+//		sb.append(" where 1=1 ");
+//		String date = " ap_paybill.billdate ";
+//		if (StringUtils.isNotBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and  " + date + " < '" + date_end + "' and " + date
+//					+ " >= '" + date_start + "' ");
+//		} else if (StringUtils.isBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and " + date + "  < '" + date_end + "' ");
+//		}
+//		sb.append(FBPuCtRptConstant.Sql_group_by);
+		/***------------------------优化前----end---------------------**/		
+
+		/***------------------------优化后----start---------------------**/
+		sb.append(" select distinct tem_fbpuct_pay.pk_ct_pu pk_ct_pu, sum(ap_payitem.local_notax_de) nmny, sum(ap_payitem.local_money_de) ntaxmny  from tem_fbpuct_pay  inner join ap_payitem  on ap_payitem.pk_payitem = tem_fbpuct_pay.bid  inner join ap_paybill   on ap_paybill.pk_paybill = ap_payitem.pk_paybill ");
 		sb.append(" where 1=1 ");
 		String date = " ap_paybill.billdate ";
 		if (StringUtils.isNotBlank(date_start)
@@ -517,7 +664,8 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 				&& StringUtils.isNotBlank(date_end)) {
 			sb.append(" and " + date + "  < '" + date_end + "' ");
 		}
-		sb.append(FBPuCtRptConstant.Sql_group_by);
+		sb.append(" group by tem_fbpuct_pay.pk_ct_pu ");
+		/***------------------------优化后----start---------------------**/
 		DataAccessUtils querytool = new DataAccessUtils();
 		IRowSet rs = querytool.query(sb.toString());
 		if (rs != null && rs.size() > 0) {
@@ -552,7 +700,7 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		this.queryAllCt(dataset);
 		Map<String, FBPuCtRptVO> vomap = new HashMap<String, FBPuCtRptVO>();
 		// 处理累计的数据
-//		 this.processMny(dataset, vomap, null);
+		 this.processMny(dataset, vomap, null);
 		
 		//处理组织名称、项目名称、合同名称等内容
 		processShowInfo(dataset);
