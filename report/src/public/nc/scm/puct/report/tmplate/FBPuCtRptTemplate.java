@@ -24,12 +24,16 @@ import nc.scmmm.vo.scmpub.report.entity.metadata.SCMProviderMetaData;
 import nc.scmmm.vo.scmpub.report.viewfactory.define.SCMView;
 import nc.vo.ct.purdaily.entity.CtPuVO;
 import nc.vo.pub.BusinessException;
+import nc.vo.pub.lang.UFDouble;
 import nc.vo.pub.query.ConditionVO;
 import nc.vo.pubapp.pattern.data.IRowSet;
 
 import org.apache.commons.lang.StringUtils;
 
 public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
+	private boolean has_project =false;
+	private boolean has_zbct =false;
+	private boolean has_supply =false;
 	private FBPuCtView view = null;
 	// 来自查询对话框的查询条件vo
 	public List<ConditionVO> condsFromQryDlgList;
@@ -65,40 +69,12 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 			initView.initDetails();
 			return initView;
 		}
-		//
-		// this.tranMap = this.getSCMReportTransMap();
-		// this.timezone = this.tranMap.getLocalTimeZone();
-		// if (null != this.tranMap.get(StockExecConstant.LINKQUERY)) {
-		// this.isLinkQuery = UFBoolean.TRUE;
-		// }
-		// // 为后面的期间临时表设置开始结束时间
-		// this.handlerAnalyDate(this.tranMap);
-		// // 单据来源
-		// this.billsrc = this.getBillSrc();
-		//
-		// if (this.billsrc == ExecPriceBillSrcEnum.POORDER) {
-		// this.headalias = ExecPriceConstant.POORDER_H;
-		// this.bodyalias = ExecPriceConstant.POORDER_B;
-		// }
-		// else {
-		// this.headalias = ExecPriceConstant.POINVOICE_H;
-		// this.bodyalias = ExecPriceConstant.POINVOICE_B;
-		// }
-		// this.view =
-		// new ExecPriceRptView(this.getScmReportContext(), this.billsrc, true);
 		this.view = new FBPuCtView(this.getScmReportContext());
 		this.view.initDetails();
 		this.processWhere();
-		//
-		// this.view.initSelectDetails(this.headalias, this.bodyalias,
-		// this.pricetype);
-		//
-		// String patchGroup =
-		// this.bodyalias + "." + ExecPriceDispData.PK_SRCMATERIAL + " , "
-		// + this.headalias + "." + ExecPriceDispData.CORIGCURRENCYID;
-		// this.view.setPatchGroup(patchGroup);
-		// this.processInnerJoin();
-		// return this.view;
+		this.view.setHas_project(has_project);
+		this.view.setHas_supply(has_supply);
+		this.view.setHas_zbct(has_zbct);
 		return this.view;
 	}
 
@@ -127,140 +103,172 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 				condvo.setFieldCode("ct_pu.pk_org");
 				this.condsFromQryDlgList.add(condvo);
 			}
+			// 项目编码
+			else if (condvo.getFieldCode().equals("projectcode")) {
+//				this.has_project=true;
+//				where.append(" and ");
+//				where.append(FBPuCtRptConstant.TABLE_PROJECT+".project_code ");
+//				if (condvo.getOperaCode().equals("=")) {
+//					where.append(" = '" + condvo.getValue()+ "' ");
+//				} 
+//				else if (condvo.getOperaCode().contains("left like")) {
+//					where.append("  like '%" + condvo.getValue()+ "%' ");
+//				}
+				where.append(" and ");
+				if (condvo.getOperaCode().equals("=")) {
+					where.append(" ct_pu.pk_ct_pu in ( select distinct ct_pu_b.pk_ct_pu from bd_project , ct_pu_b where  bd_project.pk_project = ct_pu_b.cbprojectid  and bd_project.project_code  =   '" + condvo.getValue()+ "'  ) ");
+				} 
+				else if (condvo.getOperaCode().contains("left like")) {
+					where.append(" ct_pu.pk_ct_pu in ( select distinct ct_pu_b.pk_ct_pu from bd_project , ct_pu_b where  bd_project.pk_project = ct_pu_b.cbprojectid  and bd_project.project_code like '" + condvo.getValue()+ "%'  ) ");
+				}
+			}
+			// 项目名称
+			else if (condvo.getFieldCode().equals("projectname")) {
+//				this.has_project=true;
+//				where.append(" and ");
+//				where.append(FBPuCtRptConstant.TABLE_PROJECT+".project_name ");
+//				if (condvo.getOperaCode().equals("=")) {
+//					where.append(" = '" + condvo.getValue()+ "' ");
+//				} 
+//				else if (condvo.getOperaCode().contains("left like")) {
+//					where.append("  like '" + condvo.getValue()+ "%' ");
+//				}
+				where.append(" and ");
+				if (condvo.getOperaCode().equals("=")) {
+					where.append(" ct_pu.pk_ct_pu in ( select distinct ct_pu_b.pk_ct_pu from bd_project , ct_pu_b where  bd_project.pk_project = ct_pu_b.cbprojectid  and bd_project.project_name = '" + condvo.getValue()+ "'  ) ");
+				} 
+				else if (condvo.getOperaCode().contains("left like")) {
+					where.append(" ct_pu.pk_ct_pu in ( select distinct ct_pu_b.pk_ct_pu from bd_project , ct_pu_b where  bd_project.pk_project = ct_pu_b.cbprojectid  and bd_project.project_name like '" + condvo.getValue()+ "%'  ) ");
+				}
+			}
+			// 总包合同编码
+			else if (condvo.getFieldCode().equals("xsvbillcode")) {
+				if (condvo.getOperaCode().equals("=")) {
+					where.append(" and ( " );
+						where.append(" ct_pu.vdef5 =  '" + condvo.getValue() + "' " );
+						where.append(" or ");
+						where.append(" ct_pu.vdef15 = '" + condvo.getValue() + "' ");
+					where.append(" ) ");
+				} 
+				else if (condvo.getOperaCode().contains("left like")) {
+					where.append(" and ( " );
+						where.append(" ct_pu.vdef5  like '"	+ condvo.getValue() + "%'" );
+						where.append(" or ");
+						where.append(" ct_pu.vdef15  like  '"+ condvo.getValue() + "%'  ");
+					where.append(" ) ");
+				}
+			}
+			// 总包合同名称
+			else if (condvo.getFieldCode().equals("xsctname")) {
+				this.has_zbct=true;
+//				if (condvo.getOperaCode().equals("=")) {
+//					where.append(" and ( " );
+//						where.append(FBPuCtRptConstant.TABLE_SK+".ctname = '" + condvo.getValue()+ "' ");
+//						where.append(" or ");
+//						where.append(FBPuCtRptConstant.TABLE_XS+".ctname = '" + condvo.getValue()+ "' ");
+//					where.append(" ) ");
+//				} 
+//				else if (condvo.getOperaCode().contains("left like")) {
+//					where.append(" and ( " );
+//						where.append(FBPuCtRptConstant.TABLE_SK+".ctname  like '" + condvo.getValue()+ "%' ");
+//						where.append(" or ");
+//						where.append(FBPuCtRptConstant.TABLE_XS+".ctname  like '" + condvo.getValue()+ "%' ");
+//					where.append(" ) ");
+//				}
+				if (condvo.getOperaCode().equals("=")) {
+					where.append(" and ( " );
+						where.append(" ct_pu.vdef5 in  ( select distinct vbillcode from  fct_ar  where fct_ar.dr  = 0 and fct_ar.ctname  = '" + condvo.getValue()+ "' ) " );
+						where.append(" or ");
+						where.append(" ct_pu.vdef15 in ( select distinct vbillcode from  ct_sale where ct_sale.dr = 0 and ct_sale.ctname = '" + condvo.getValue() + "' ) ");
+					where.append(" ) ");
+				} 
+				else if (condvo.getOperaCode().contains("left like")) {
+					where.append(" and ( " );
+						where.append(" ct_pu.vdef5 in  ( select distinct vbillcode from  fct_ar  where fct_ar.dr  = 0 and fct_ar.ctname   like '" + condvo.getValue() + "%' ) " );
+						where.append(" or ");
+						where.append(" ct_pu.vdef15 in ( select distinct vbillcode from  ct_sale where ct_sale.dr = 0 and ct_sale.ctname  like '" + condvo.getValue() + "%' ) ");
+					where.append(" ) ");
+				}
+			}
 			// 采购合同编码
 			else if (condvo.getFieldCode().equals(CtPuVO.VBILLCODE)) {
-				condvo.setFieldCode("ct_pu.vbillcode");
-				this.condsFromQryDlgList.add(condvo);
+				where.append(" and ");
+				where.append("ct_pu.vbillcode");
+				if (condvo.getOperaCode().equals("=")) {
+					where.append(" = '" + condvo.getValue()+ "' ");
+				} 
+				else if (condvo.getOperaCode().contains("left like")) {
+					where.append("  like '" + condvo.getValue()+ "%' ");
+				}
 			}
 			// 采购合同名称
 			else if (condvo.getFieldCode().equals(CtPuVO.CTNAME)) {
+				where.append(" and ");
+				where.append("ct_pu.ctname");
 				if (condvo.getOperaCode().equals("=")) {
-					where.append(" and ct_pu.ctname = '" + condvo.getValue()
-							+ "'  ");
-				} else if (condvo.getOperaCode().contains("left like")) {
-					where.append(" and  ct_pu.cname left like  '"
-							+ condvo.getValue() + "%' ");
+					where.append(" = '" + condvo.getValue()+ "' ");
+				} 
+				else if (condvo.getOperaCode().contains("left like")) {
+					where.append("  like '" + condvo.getValue()+ "%' ");
 				}
 			}
-			// // 总包合同签订日期
-			// else if
-			// (condvo.getFieldCode().equals(ExecPriceQueryConst.MATERIALCODE))
-			// {
-			// condvo.setFieldCode(this.bodyalias + "."
-			// + ExecPriceDispData.PK_MATERIAL);
-			// this.condsFromQryDlgList.add(condvo);
-			// }
-			// //
-			// else if
-			// (condvo.getFieldCode().equals(ExecPriceQueryConst.MATERIALNAME))
-			// {
-			// if (condvo.getOperaCode().equals("in")) {
-			// where.append(" and bd_material.name in " + condvo.getValue() +
-			// "");
-			// }
-			// else if (condvo.getOperaCode().equals("=")) {
-			// where.append(" and bd_material.name = '"
-			// + SCMESAPI.sqlEncodeGeneral(condvo.getValue()) + "' ");
-			// }
-			// else if (condvo.getOperaCode().contains("left like")) {
-			// where.append(" and bd_material.name like '"
-			// + SCMESAPI.sqlEncodeGeneral(condvo.getValue()) + "%' ");
-			// }
-			// continue;
-			// }
-			// // 分析区间:非其他
-			// else if
-			// (condvo.getFieldCode().equals(ExecPriceQueryConst.ANALYAREA)
-			// && !condvo.getValue().equals(
-			// String.valueOf(ExecPricePeriodTypeEnum.OTHER))) {
-			// this.analyArea = Integer.valueOf(condvo.getValue()).intValue();
-			// } // 分析区间：其他
-			// else if
-			// (condvo.getFieldCode().equals(ExecPriceQueryConst.ANALYAREA)
-			// && condvo.getValue().equals(
-			// String.valueOf(ExecPricePeriodTypeEnum.OTHER))) {
-			// for (ConditionVO innerConVO : generalConds) {
-			// if (innerConVO.getFieldCode().equals(ExecPriceQueryConst.DAYS)) {
-			// this.analyArea =
-			// Integer.valueOf("33" + innerConVO.getValue()).intValue();
-			// }
-			// }
-			// }
-			// // 天数
-			// else if (condvo.getFieldCode().equals(ExecPriceQueryConst.DAYS)
-			// && condvo.getValue().equals(
-			// String.valueOf(ExecPricePeriodTypeEnum.OTHER))) {
-			// }
-			// // 价格取值
-			// else if
-			// (condvo.getFieldCode().equals(ExecPriceQueryConst.PRICETYPE)) {
-			// this.pricetype = Integer.valueOf(condvo.getValue()).intValue();
-			// // // 含税, 原币价税合计非负
-			// // if (this.pricetype == StockExecPriceTypeEnum.TAX) {
-			// // where.append("and not( coalesce(" + this.bodyalias + "."
-			// // + StockExecConstant.NORIGTAXMNY + ",0) < 0) ");
-			// // }
-			// // // 不含税, 原币无税金额非负
-			// // else if (this.pricetype == StockExecPriceTypeEnum.UNTAX) {
-			// // where.append("and not( coalesce(" + this.bodyalias + "."
-			// // + StockExecConstant.NORIGMNY + ",0) < 0) ");
-			// // }
-			// }
-			//
-			// 单据日期
-			else if (condvo.getFieldCode().equals(CtPuVO.DBILLDATE)) {
-				// String[] dates = condvo.getValue().split(",");
-				// this.beginDate = new UFDate(dates[0]);
-				// this.endDate = new UFDate(dates[1]);
-				// //
-				// String filedcode = condvo.getFieldCode();
-				// // condvo.setFieldCode(this.headalias + "." + filedcode);
-				this.condsFromQryDlgList.add(condvo);
-			}
-			// 总包合同编码
-			else if (condvo.getFieldCode().equals("zbvbillcode")) {
+			// 采购供应商
+			else if (condvo.getFieldCode().equals("cvendorid")) {
+				this.has_supply=true;
+				where.append(" and ");
+				where.append("ct_pu.cvendorid");
 				if (condvo.getOperaCode().equals("=")) {
-					where.append(" and ( ct_pu.vdef5 = '" + condvo.getValue()
-							+ "' or ct_pu.vdef15 = '" + condvo.getValue()
-							+ "' ) ");
-				} else if (condvo.getOperaCode().contains("left like")) {
-					where.append(" and ( ct_pu.vdef5 left like '"
-							+ condvo.getValue()
-							+ "%' or ct_pu.vdef15 left like  '"
-							+ condvo.getValue() + "%' ) ");
+					where.append(" = '" + condvo.getValue()+ "' ");
+				} 
+				else if (condvo.getOperaCode().contains("in")) {
+					where.append(" in " + condvo.getValue()+ " ");
 				}
+			}
+			// 总包合同签订日期
+			else if (condvo.getFieldCode().equals("subscribedate_xs")) {
+				String str = condvo.getSQLStr();
+				String str_xs=str.replace("subscribedate_xs", "ct_sale.dbilldate");
+				String str_sk=str.replace("subscribedate_xs", "fct_ar.dbilldate");
+//				if (condvo.getOperaCode().equals("=")) {
+					where.append(" and ( " );
+						where.append(" ct_pu.vdef5 in  ( select distinct vbillcode from  fct_ar  where fct_ar.dr  = 0 "+str_sk+" ) " );
+						where.append(" or ");
+						where.append(" ct_pu.vdef15 in ( select distinct vbillcode from  ct_sale where ct_sale.dr = 0 "+str_xs+" ) ");
+					where.append(" ) ");
+//				} 
+//				else if (condvo.getOperaCode().contains("left like")) {
+//					where.append(" and ( " );
+//						where.append(" ct_pu.vdef5 in  ( select distinct vbillcode from  fct_ar  where fct_ar.dr  = 0 and fct_ar.ctname   like '" + condvo.getValue() + "%' ) " );
+//						where.append(" or ");
+//						where.append(" ct_pu.vdef15 in ( select distinct vbillcode from  ct_sale where ct_sale.dr = 0 and ct_sale.ctname  like '" + condvo.getValue() + "%' ) ");
+//					where.append(" ) ");
+//				}
+				String ss = null;
 			}
 			// 采购合同签订日期
-			else if (condvo.getFieldCode().equals("fbctqddate")) {
-				condvo.setFieldCode("ct_pu." + CtPuVO.SUBSCRIBEDATE);
-				this.condsFromQryDlgList.add(condvo);
-			}
-			// // 表头：采购组织、采购部门、业务流程、币种、单据日期
-			// else if (condvo.getFieldCode().equals(ExecPriceQueryConst.PK_ORG)
-			// || condvo.getFieldCode().equals(ExecPriceQueryConst.PK_DEPT)
-			// || condvo.getFieldCode().equals(ExecPriceQueryConst.PK_BUSITYPE)
-			// ||
-			// condvo.getFieldCode().equals(ExecPriceQueryConst.CORIGCURRENCYID))
-			// {
-			// String filedcode = condvo.getFieldCode();
-			// condvo.setFieldCode(this.headalias + "." + filedcode);
-			// this.condsFromQryDlgList.add(condvo);
-			// }
-			// // 供应商
-			else if (condvo.getFieldCode().equals(CtPuVO.CVENDORID)) {
-				// String filedcode = condvo.getFieldCode();
-				// condvo.setFieldCode(this.bodyalias + "." + filedcode);
-				this.condsFromQryDlgList.add(condvo);
-			}else{
-				if(condvo.getFieldCode().indexOf("ct_pu_b")>=0){
-					this.view.setHas_body_condition(true);
-				}
-				this.condsFromQryDlgList.add(condvo);
+			else if (condvo.getFieldCode().equals("subscribedate")) {
+				String str = condvo.getSQLStr();
+				str=str.replace("dbilldate", "ct_pu.subscribedate");
+				where.append(str);}
+			// 采购合同单据日期
+			else if (condvo.getFieldCode().equals("dbilldate")) {
+				String str = condvo.getSQLStr();
+				str=str.replace("dbilldate", "ct_pu.dbilldate");
+				where.append(str);
+//				 String[] dates = condvo.getValue().split(",");
+//				 String beginDate = dates[0];
+//				 String endDate = dates[1];
+//				 if(StringUtils.isNotBlank(beginDate)&&!beginDate.toLowerCase().equals("isnull")){
+//					 where.append(" and ");
+//					 where.append(" ct_pu.dbilldate >= '"+beginDate+"' ");
+//				 }
+//				 if(StringUtils.isNotBlank(endDate)&&!"ISNULL".equals(endDate)){
+//					 where.append(" and ");
+//					 where.append(" ct_pu.dbilldate <= '"+endDate+"' ");
+//				 }
 			}
 		}
 	}
-	
-	
 	
 	@Override
 	protected boolean isAddRowIndex() {
@@ -296,34 +304,102 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		FBPuCtRptTemptableUtils.createTempTab(dataset.getDatas(),
 				FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
 		String sql = this.view.getViewSql();
+		sql=sql.replace("distinct", "");
 		String newsql = sql.substring(0, sql.indexOf("where"));
-		StringBuffer sb = new StringBuffer("");
-		sb.append(newsql);
-		sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
-		sb.append(" where  ");
-		sb.append(" ( ");
-
-		// ---总包合同为销售合同或者收款合同，且销售合同或收款合同不能同时为空----start--------------
-		sb.append(" ( ");
-		sb.append(" ( ct_pu.vdef5 = "
-				+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS
-				+ ".vdef5 or ct_pu.vdef15 ="
-				+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef15 ) ");
-		sb.append(" and (  ");
-		sb.append("  ( nvl(ct_pu.vdef5,'1')='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
-		sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')='1' ) ");
-		sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
-		sb.append(" ) ");
-		sb.append(" ) ");
-		// ---总包合同为销售合同或者收款合同，且销售合同或收款合同不能同时为空----end--------------
-
-		sb.append(" or ct_pu.pk_ct_pu= "
-				+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "."
-				+ FBPuCtRptFieldConstant.PK_FBHT);
-		sb.append(" ) ");
-		sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
-		String query_sql =sb.toString().replace("select ", " select distinct ");
+		
+		StringBuffer sk_sb = new StringBuffer("");
+		sk_sb.append(newsql);
+		sk_sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+		sk_sb.append(" where  ");
+		sk_sb.append(" ( ");
+		// ---总包合同为收款合同，且收款合同不能同时为空----start--------------
+		sk_sb.append(" ( ");
+		sk_sb.append(" (  ( ct_pu.vdef5 = " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef5  and " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef5 <> '~' )");
+		sk_sb.append(" or ");
+		sk_sb.append(" ( ct_pu.vdef15 = " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef15   and " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef15 <> '~' ) ");
+		
+		sk_sb.append(") and (  ");
+		sk_sb.append("  ( nvl(ct_pu.vdef5,'1')='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+		sk_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')='1' ) ");
+		sk_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+		sk_sb.append(" ) ");
+		sk_sb.append(" ) ");
+		// ---总包合同为收款合同，且收款合同不能同时为空----end--------------
+		sk_sb.append(" or ct_pu.pk_ct_pu= "	+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "." + FBPuCtRptFieldConstant.PK_FBHT);
+		sk_sb.append(" ) ");
+		sk_sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
+//		sk_sb.append(" order by ct_pu.pk_org , ");
+		
+		
+//		StringBuffer sk_sb = new StringBuffer("");
+//		sk_sb.append(newsql);
+//		sk_sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+//		sk_sb.append(" where  ");
+////		sk_sb.append(" ( ");
+//		// ---总包合同为收款合同，且收款合同不能同时为空----start--------------
+////		sk_sb.append(" ( ");
+//		sk_sb.append(" ct_pu.vdef5 = " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef5   ");
+//		sk_sb.append(" and ");
+//		sk_sb.append(" nvl(ct_pu.vdef5,'1')!='1'  ");
+//		sk_sb.append(" and ");
+//		sk_sb.append(" ct_pu.vdef5 <> '~' ");
+////		sk_sb.append(" and (  ");
+////		sk_sb.append("  ( nvl(ct_pu.vdef5,'1')='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+////		sk_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')='1' ) ");
+////		sk_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+////		sk_sb.append(" ) ");
+////		sk_sb.append(" ) ");
+//		// ---总包合同为收款合同，且收款合同不能同时为空----end--------------
+////		sk_sb.append(" or ct_pu.pk_ct_pu= "	+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "." + FBPuCtRptFieldConstant.PK_FBHT);
+////		sk_sb.append(" ) ");
+//		sk_sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
+//		
+//		StringBuffer xs_sb = new StringBuffer("");
+//		xs_sb.append(newsql);
+//		xs_sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+//		xs_sb.append(" where  ");
+////		xs_sb.append(" ( ");
+//		// ---总包合同为销售合同，且销售合同不能同时为空----start--------------
+////		xs_sb.append(" ( ");
+//		xs_sb.append("  ct_pu.vdef15 ="	+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef15  ");
+//		sk_sb.append(" and ");
+//		sk_sb.append(" nvl(ct_pu.vdef15,'1')!='1'  ");
+//		sk_sb.append(" and ");
+//		sk_sb.append(" ct_pu.vdef15 <> '~' ");
+////		xs_sb.append(" and (  ");
+////		xs_sb.append("  ( nvl(ct_pu.vdef5,'1')='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+////		xs_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')='1' ) ");
+////		xs_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+////		xs_sb.append(" ) ");
+////		xs_sb.append(" ) ");
+//		// ---总包合同为销售合同，且销售合同不能同时为空----end--------------
+////		xs_sb.append(" or ct_pu.pk_ct_pu= "
+////				+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "."
+////				+ FBPuCtRptFieldConstant.PK_FBHT);
+////		xs_sb.append(" ) ");
+//		xs_sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
+//		
+//		
+//		StringBuffer ct_sb = new StringBuffer("");
+//		ct_sb.append(newsql);
+//		ct_sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+//		ct_sb.append(" where  ");
+//		ct_sb.append("  ct_pu.pk_ct_pu= "
+//				+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "."
+//				+ FBPuCtRptFieldConstant.PK_FBHT);
+//		ct_sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
+//		
+//		StringBuffer sb = new StringBuffer("");
+//		sb.append(sk_sb.toString());
+//		sb.append(" union  ");
+//		sb.append(xs_sb.toString());
+//		sb.append(" union  ");
+//		sb.append(ct_sb.toString());
+		
+		String query_sql =sk_sb.toString().replace("select ", " select distinct ");
 		DataAccessUtils querytool = new DataAccessUtils();
+//		throw new RuntimeException("dd");
+		
 		IRowSet is = querytool.query(query_sql);
 		String[][] objs = is.toTwoDimensionStringArray();
 		dataset.setDatas(objs);
@@ -789,6 +865,27 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 			}
 		}
 
+		//处理总包合同名称:收款合同或销售合同
+		Map<String,String> xsnamemap = new HashMap<String,String>();
+		StringBuffer xsnamesql = new StringBuffer("");
+		xsnamesql.append(" select distinct ct_sale.ctname,"+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".pk_ct_pu from "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+" ,ct_sale   where "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".vdef15 = ct_sale.vbillcode and ct_sale.dr=0   ") ;
+		IRowSet xsnamers = tool.query(xsnamesql.toString());
+		if(xsnamers!=null&&xsnamers.size()>0){
+			String[][] arr = xsnamers.toTwoDimensionStringArray();
+			for(String[] ar :arr){
+				xsnamemap.put(ar[1],ar[0]);
+			}
+		}
+		Map<String,String> sknamemap = new HashMap<String,String>();
+		StringBuffer sknamesql = new StringBuffer("");
+		sknamesql.append(" select distinct fct_ar.ctname,"+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".pk_ct_pu from "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+" ,fct_ar   where "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".vdef5 = fct_ar.vbillcode and fct_ar.dr =0  ") ;
+		IRowSet sknamers = tool.query(sknamesql.toString());
+		if(sknamers!=null&&sknamers.size()>0){
+			String[][] arr = sknamers.toTwoDimensionStringArray();
+			for(String[] ar :arr){
+				sknamemap.put(ar[1],ar[0]);
+			}
+		}
 		
 		SCMRptColumnInfo columninfo = dataset.getColumninfo();
 		Map<String, Integer> indexmap = columninfo.getColumnIndexMap();
@@ -815,6 +912,15 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		int index_zbct_code_xs = indexmap.get(FBPuCtRptFieldConstant.PK_ZBHT_CODE_XS).intValue();
 		int index_zbct_code_sk = indexmap.get(FBPuCtRptFieldConstant.PK_ZBHT_CODE_SK).intValue();
 		
+		int index_zbct_name_xs = indexmap.get(FBPuCtRptFieldConstant.PK_ZBHT_XS).intValue();
+		
+		//计算合同进度
+		int index_ninmny_all = indexmap.get(FBPuCtRptFieldConstant.NINMNY_ALL).intValue();
+		int index_nhtcb = indexmap.get(FBPuCtRptFieldConstant.NHTCB).intValue();
+		//进度
+		int index_nrate_all = indexmap.get(FBPuCtRptFieldConstant.NRATE_ALL).intValue();
+		
+		
 		for (int i = 0; i < num; i++) {
 			String pk = (String) arrs[i][index_pk];
 			String pk_org = (String) arrs[i][index_pk_org];
@@ -829,6 +935,16 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 			String zbctcode = (String)arrs[i][index_zbct_code_xs];
 			if(StringUtils.isBlank(zbctcode)){
 				arrs[i][index_zbct_code_xs]=arrs[i][index_zbct_code_sk];
+				arrs[i][index_zbct_name_xs]=sknamemap.get(pk);
+			}else{
+				arrs[i][index_zbct_name_xs]=xsnamemap.get(pk);
+			}
+			String ninmny_all = (String)arrs[i][index_ninmny_all];
+			String nhtcb = (String)arrs[i][index_nhtcb];
+			if(StringUtils.isNotBlank(ninmny_all)||StringUtils.isNotBlank(nhtcb)){
+				arrs[i][index_nrate_all]=new UFDouble(ninmny_all).div(new UFDouble(nhtcb)).multiply(100).toString();
+			}else{
+				arrs[i][index_nrate_all]=0;
 			}
 		}
 	}

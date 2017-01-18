@@ -3,6 +3,19 @@ package nc.scm.puct.report.tmplate.source;
 import nc.vo.pub.JavaType;
 
 public class FBPuCtRptConstant {
+	/**供应商表名*/
+	public final static String TABLE_SUPPLY="bd_supplier";
+	/**项目表名*/
+	public final static String TABLE_PROJECT="bd_project";
+	/**合同表头表名*/
+	public final static String TABLE_CT="ct_pu";
+	/**合同表体表名*/
+	public final static String TABLE_CT_B="ct_pu_b";
+	/**收款合同表名*/
+	public final static String TABLE_SK="fct_ar";
+	/**销售合同表名*/
+	public final static String TABLE_XS="ct_sale";
+	
 	  public final static String SQLTYPE_DOUBLE ="number(28,8)";
 	  public final static String SQLTYPE_STRING ="varchar2(200)";
 	  public final static String TEM_FBPUCT_FROM_CONDITIONS ="tem_fbpuct_from_conditions";

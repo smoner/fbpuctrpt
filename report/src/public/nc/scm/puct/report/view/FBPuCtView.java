@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.ibm.db2.jcc.am.df;
+
 import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
-import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldConstant;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldPreference;
 import nc.scmmm.pub.scmpub.report.baseutil.SCMStringUtil;
 import nc.scmmm.vo.scmpub.report.pub.ISCMReportContext;
@@ -18,15 +19,34 @@ import nc.vo.pub.JavaType;
 public class FBPuCtView extends SCMPermissionBeanSqlView {
 	private static final long serialVersionUID = -5633594163847083267L;
 	private String patchWhere = "";
-	public boolean isHas_body_condition() {
-		return has_body_condition;
+	private boolean has_project =false;
+	private boolean has_zbct =false;
+	private boolean has_supply =false;
+
+	public boolean isHas_project() {
+		return has_project;
 	}
 
-	public void setHas_body_condition(boolean has_body_condition) {
-		this.has_body_condition = has_body_condition;
+	public boolean isHas_zbct() {
+		return has_zbct;
 	}
 
-	private boolean has_body_condition =false;
+	public boolean isHas_supply() {
+		return has_supply;
+	}
+
+	public void setHas_project(boolean has_project) {
+		this.has_project = has_project;
+	}
+
+	public void setHas_zbct(boolean has_zbct) {
+		this.has_zbct = has_zbct;
+	}
+
+	public void setHas_supply(boolean has_supply) {
+		this.has_supply = has_supply;
+	}
+
 	public FBPuCtView(
 	      ISCMReportContext context) {
 	    super(new CtPuVO(), context);
@@ -47,14 +67,27 @@ public class FBPuCtView extends SCMPermissionBeanSqlView {
 
 	  @Override
 	  public String getViewSql() {
-		    StringBuilder bf = new StringBuilder(" select ");
+		    StringBuilder bf = new StringBuilder(" select distinct ");
 		    bf.append(this.getSelectFieldsPart());
 		    bf.append(" from ");
 		    bf.append(this.getViewFromPart());
-		    if(has_body_condition){
-		    	bf.append(" inner join ct_pu_b on ct_pu_b.pk_ct_pu = ct_pu.pk_ct_pu ");
-		    }
+//		    if(this.isHas_project()){
+//		    	bf.append(" , ct_pu_b , bd_project ");
+////		    	bf.append(" ct_pu_b.pk_ct_pu = ct_pu.pk_ct_pu and ct_pu_b.dr = 0 and  bd_project.pk_project = ct_pu_b.pk_project and bd_project.dr = 0  ");
+//		    }
+//		    if(this.isHas_zbct()){
+//		    	bf.append(" inner join ct_pu_b on ct_pu_b.pk_ct_pu = ct_pu.pk_ct_pu and ct_pu_b.dr = 0 ");
+//		    	bf.append(" inner join bd_project on bd_project.pk_project = ct_pu_b.pk_project and bd_project.dr = 0 ");
+//		    }
+//		    if(this.isHas_supply()){
+//		    	bf.append(" inner join ct_pu_b on ct_pu_b.pk_ct_pu = ct_pu.pk_ct_pu and ct_pu_b.dr = 0 ");
+//		    	bf.append(" inner join bd_project on bd_project.pk_project = ct_pu_b.pk_project and bd_project.dr = 0 ");
+//		    }
 		    bf.append(" where ");
+//		    if(this.isHas_project()){
+//		    	bf.append("  ct_pu_b.pk_ct_pu = ct_pu.pk_ct_pu and  bd_project.pk_project = ct_pu_b.cbprojectid and bd_project.dr = 0 and ct_pu_b.dr = 0 ");
+//		    	bf.append(" and ");
+//		    }
 		    bf.append(this.getViewWherePart());
 		    if (this.isGroup()) {
 		      bf.append(" group by ");

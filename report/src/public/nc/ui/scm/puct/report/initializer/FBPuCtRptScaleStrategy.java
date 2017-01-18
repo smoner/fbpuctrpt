@@ -1,5 +1,11 @@
 package nc.ui.scm.puct.report.initializer;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
+import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldConstant;
+import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldPreference;
 import nc.scmmm.pub.scmpub.report.scale.SCMRptAbsScalePrcStrategy;
 import nc.scmmm.vo.scmpub.report.entity.scale.SCMReportScaleMetaRegister;
 
@@ -53,6 +59,15 @@ public class FBPuCtRptScaleStrategy extends SCMRptAbsScalePrcStrategy {
 	  @Override
 	  protected void registerScaleProcess(
 	      SCMReportScaleMetaRegister scmRptScaleRegister) {
+		  List<String> fieldnames = new ArrayList<String>();
+		  fieldnames.add(FBPuCtRptFieldConstant.NHTMNY);
+		  fieldnames.add(FBPuCtRptFieldConstant.NHTCB);
+		  for(FBPuCtRptFieldPreference f :FBPuCtRptConstant.SMART_FIELDS_NMNY){
+//			  if(!FBPuCtRptFieldConstant.NRATE_ALL.equals(f.getFieldname())){
+				  fieldnames.add(f.getFieldname());
+//			  }
+		  }
+		  scmRptScaleRegister.setConstantDigits(fieldnames.toArray(new String[0]), 2);
 //	    // 本币金额：采购 金额
 //	    scmRptScaleRegister.setMnyDigits(ExecPriceDispData.CORIGCURRENCYID,
 //	        this.getMnyKey());
