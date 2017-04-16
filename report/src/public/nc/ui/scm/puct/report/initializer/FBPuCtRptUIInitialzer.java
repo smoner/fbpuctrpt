@@ -2,8 +2,6 @@ package nc.ui.scm.puct.report.initializer;
 
 import java.util.Map;
 
-import nc.pub.pp.rept.stockexec.adjust.StockExecRptAdjustor;
-import nc.pub.pp.rept.stockexec.scale.StockExecScaleStrategy;
 import nc.scmmm.pub.scmpub.report.adjustor.SCMRptDefaultAdjustor;
 import nc.scmmm.pub.scmpub.report.scale.SCMRptAbsScalePrcStrategy;
 import nc.scmmm.ui.scmpub.report.action.SCMRptQueryConditionDLGInitializer;

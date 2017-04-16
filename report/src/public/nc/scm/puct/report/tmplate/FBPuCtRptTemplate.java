@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import nc.impl.pubapp.pattern.database.DataAccessUtils;
 import nc.scm.puct.report.temtable.FBPuCtRptTemptableUtils;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
@@ -941,10 +942,10 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 			}
 			String ninmny_all = (String)arrs[i][index_ninmny_all];
 			String nhtcb = (String)arrs[i][index_nhtcb];
-			if(StringUtils.isNotBlank(ninmny_all)||StringUtils.isNotBlank(nhtcb)){
-				arrs[i][index_nrate_all]=new UFDouble(ninmny_all).div(new UFDouble(nhtcb)).multiply(100).toString();
+			if(StringUtils.isNotBlank(ninmny_all)&&StringUtils.isNotBlank(nhtcb)){
+				arrs[i][index_nrate_all]=(Object)new UFDouble(ninmny_all).div(new UFDouble(nhtcb)).multiply(100).toString();
 			}else{
-				arrs[i][index_nrate_all]=0;
+				arrs[i][index_nrate_all]=null;
 			}
 		}
 	}

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.ibm.db2.jcc.am.df;
 
 import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldPreference;
