@@ -833,7 +833,7 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		//处理合同成本
 		Map<String,String> ctcbmap = new HashMap<String,String>();
 		StringBuffer ctcbsql = new StringBuffer("");
-		ctcbsql.append("  select distinct sum(ct_pu_b.norigmny) mny ,ct_pu_b.pk_ct_pu  from  "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+",ct_pu_b where ct_pu_b.pk_ct_pu = "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".pk_ct_pu group by ct_pu_b.pk_ct_pu and  ct_pu_b.dr = 0") ;
+		ctcbsql.append("  select distinct sum(ct_pu_b.norigmny) mny ,ct_pu_b.pk_ct_pu  from  "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+",ct_pu_b where   ct_pu_b.dr = 0 and ct_pu_b.pk_ct_pu = "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".pk_ct_pu group by ct_pu_b.pk_ct_pu ") ;
 		IRowSet ctcbrs = tool.query(ctcbsql.toString());
 		if(ctcbrs!=null&&ctcbrs.size()>0){
 			String[][] arr = ctcbrs.toTwoDimensionStringArray();
