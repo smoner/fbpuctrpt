@@ -553,7 +553,7 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 
 		/***------------------------优化后----start---------------------**/
 		sb.append(" select distinct tem_fbpuct_in.pk_ct_pu pk_ct_pu, sum(ic_purchasein_b.nmny) nmny, sum(ic_purchasein_b.ntaxmny) ntaxmny  from tem_fbpuct_in  inner join ic_purchasein_b on ic_purchasein_b.cgeneralbid = tem_fbpuct_in.bid  inner join ic_purchasein_h  on ic_purchasein_h.cgeneralhid = ic_purchasein_b.cgeneralhid ");
-		sb.append(" where 1=1 ");
+		sb.append(" where 1=1 and ic_purchasein_b.dr =0 and ic_purchasein_h.dr = 0 ");
 		String date = " ic_purchasein_h.dbilldate ";
 		if (StringUtils.isNotBlank(date_start)
 				&& StringUtils.isNotBlank(date_end)) {
@@ -640,7 +640,7 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		
 		/***------------------------优化后----start---------------------**/	
 		sb.append(" select distinct tem_fbpuct_invoice.pk_ct_pu pk_ct_pu, sum(po_invoice_b.nmny) nmny,  sum(po_invoice_b.ntaxmny) ntaxmny  from tem_fbpuct_invoice  inner join po_invoice_b    on    po_invoice_b.pk_invoice_b = tem_fbpuct_invoice.bid  inner  join po_invoice   on po_invoice.pk_invoice = po_invoice_b.pk_invoice ");
-		sb.append(" where 1=1 ");
+		sb.append(" where 1=1 and po_invoice_b.dr =0 and po_invoice.dr = 0 ");
 		String date = " po_invoice.dbilldate ";
 		if (StringUtils.isNotBlank(date_start)
 				&& StringUtils.isNotBlank(date_end)) {
@@ -731,7 +731,7 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 
 		/***------------------------优化后----start---------------------**/
 		sb.append(" select distinct tem_fbpuct_pay.pk_ct_pu pk_ct_pu, sum(ap_payitem.local_notax_de) nmny, sum(ap_payitem.local_money_de) ntaxmny  from tem_fbpuct_pay  inner join ap_payitem  on ap_payitem.pk_payitem = tem_fbpuct_pay.bid  inner join ap_paybill   on ap_paybill.pk_paybill = ap_payitem.pk_paybill ");
-		sb.append(" where 1=1 ");
+		sb.append(" where 1=1 and ap_payitem.dr = 0 and ap_paybill.dr = 0 ");
 		String date = " ap_paybill.billdate ";
 		if (StringUtils.isNotBlank(date_start)
 				&& StringUtils.isNotBlank(date_end)) {
@@ -833,7 +833,7 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		//处理合同成本
 		Map<String,String> ctcbmap = new HashMap<String,String>();
 		StringBuffer ctcbsql = new StringBuffer("");
-		ctcbsql.append("  select distinct sum(ct_pu_b.norigmny) mny ,ct_pu_b.pk_ct_pu  from  "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+",ct_pu_b where ct_pu_b.pk_ct_pu = "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".pk_ct_pu group by ct_pu_b.pk_ct_pu ") ;
+		ctcbsql.append("  select distinct sum(ct_pu_b.norigmny) mny ,ct_pu_b.pk_ct_pu  from  "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+",ct_pu_b where ct_pu_b.pk_ct_pu = "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".pk_ct_pu group by ct_pu_b.pk_ct_pu and  ct_pu_b.dr = 0") ;
 		IRowSet ctcbrs = tool.query(ctcbsql.toString());
 		if(ctcbrs!=null&&ctcbrs.size()>0){
 			String[][] arr = ctcbrs.toTwoDimensionStringArray();
