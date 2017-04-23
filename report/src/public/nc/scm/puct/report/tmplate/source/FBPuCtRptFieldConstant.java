@@ -32,7 +32,8 @@ public class FBPuCtRptFieldConstant {
 	//“合同类别"
 	public static final String CHTTYPE="chttype";
 	//“合同内容"
-	public static final String CHTCONTENT="chtcontent";
+//	public static final String CHTCONTENT="chtcontent";
+	public static final String CHTCONTENT="vdef19";
 	//“合同金额"
 	public static final String NHTMNY=CtPuVO.NTOTALTAXMNY;
 	//“合同成本"
@@ -44,7 +45,8 @@ public class FBPuCtRptFieldConstant {
 	//“合同签订日期"
 	public static final String VERSION=CtPuVO.VERSION;
 	//“合同付款约定"
-	public static final String CAGREEMENT="cagreement";
+//	public static final String CAGREEMENT="cagreement";
+	public static final String CAGREEMENT="vdef20";
 	//“最终验收日期"
 	public static final String DACCEPTANCECHECK="dacceptancecheck";
 

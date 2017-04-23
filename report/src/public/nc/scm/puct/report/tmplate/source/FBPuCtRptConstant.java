@@ -85,18 +85,20 @@ public class FBPuCtRptConstant {
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.NHTMNY,"合同金额", JavaType.UFDouble,SQLTYPE_DOUBLE),
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.DSIGN,"合同签订日期", JavaType.UFDate,SQLTYPE_STRING),
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.VERSION,"合同版本", JavaType.UFDouble,SQLTYPE_DOUBLE),
+	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CHTCONTENT,"合同内容", JavaType.String,SQLTYPE_STRING),
+	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CAGREEMENT,"合同付款约定", JavaType.String,SQLTYPE_STRING),
 	      };
 	  /** 表体显示字段 - 语义模型 - 自定义字段 */
 	  public static final FBPuCtRptFieldPreference[] SMART_FIELDS_FBCT =
 	      new FBPuCtRptFieldPreference[] {
 	        //采购分包合同信息
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CHTTYPE,"合同类别", JavaType.String,SQLTYPE_STRING),
-	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CHTCONTENT,"合同内容", JavaType.String,SQLTYPE_STRING),
+//	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CHTCONTENT,"合同内容", JavaType.String,SQLTYPE_STRING),
 	        //采购合同的未税金额
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.NHTCB,"合同成本", JavaType.UFDouble,SQLTYPE_DOUBLE),
 	        //根据合同的版本号来判断
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.BCHANGE,"是否变更", JavaType.String,SQLTYPE_STRING),
-	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CAGREEMENT,"合同付款约定", JavaType.String,SQLTYPE_STRING),
+//	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.CAGREEMENT,"合同付款约定", JavaType.String,SQLTYPE_STRING),
 	        //这个采购合同的最后一次采购入库单的入库时间(到年月就可以)
 	        new FBPuCtRptFieldPreference(FBPuCtRptFieldConstant.DACCEPTANCECHECK,"最终验收日期", JavaType.UFDate,SQLTYPE_STRING),
 	      };
