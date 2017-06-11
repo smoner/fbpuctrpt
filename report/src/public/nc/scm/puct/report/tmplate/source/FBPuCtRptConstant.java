@@ -22,7 +22,7 @@ public class FBPuCtRptConstant {
 	  public final static String TEM_FBPUCT_FINAL ="tem_fbpuct_final";
 	  public final static String TEM_FBPUCT_IN ="tem_fbpuct_in";
 	  public final static String TEM_FBPUCT_INVOICE ="tem_fbpuct_invoice";
-	  public final static String TEM_FBPUCT_PAY ="tem_fbpuct_pay";
+	 // public final static String TEM_FBPUCT_PAY ="tem_fbpuct_pay";
 	  
 	  //×óÁ¬½Ósql
 	  public final static String LEFT_JOIN_ORDER =" left join po_order_b  on po_order_b.csourceid   = ct_pu.pk_ct_pu ";
