@@ -405,6 +405,118 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		String[][] objs = is.toTwoDimensionStringArray();
 		dataset.setDatas(objs);
 	}
+	/**
+	 * 
+	 * 处理总包合同（销售合同或收款合同），把总包合同下的合同全部查询出来
+	 * 20170630  因根据合同找出总包合同后,再找出子合同,存在其他组织的,所以过滤掉
+	 */
+	private void queryAllCt_noother_org(SCMRptDataSet dataset) {
+		FBPuCtRptTemptableUtils.createTempTab(dataset.getDatas(),
+				FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+		String sql = this.view.getViewSql();
+		sql=sql.replace("distinct", "");
+		String newsql = sql.substring(0, sql.indexOf("where"));
+		
+		StringBuffer sk_sb = new StringBuffer("");
+		sk_sb.append(newsql);
+		sk_sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+		sk_sb.append(" where  ");
+
+		sk_sb.append(" ct_pu.pk_org in ( select pk_org from "	+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + " )  ");
+		sk_sb.append(" and ");
+		sk_sb.append(" ( ");
+		// ---总包合同为收款合同，且收款合同不能同时为空----start--------------
+		sk_sb.append(" ( ");
+		sk_sb.append(" (  ( ct_pu.vdef5 = " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef5  and " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef5 <> '~' )");
+		sk_sb.append(" or ");
+		sk_sb.append(" ( ct_pu.vdef15 = " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef15   and " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef15 <> '~' ) ");
+		
+		sk_sb.append(") and (  ");
+		sk_sb.append("  ( nvl(ct_pu.vdef5,'1')='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+		sk_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')='1' ) ");
+		sk_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+		sk_sb.append(" ) ");
+		sk_sb.append(" ) ");
+		// ---总包合同为收款合同，且收款合同不能同时为空----end--------------
+		sk_sb.append(" or ct_pu.pk_ct_pu= "	+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "." + FBPuCtRptFieldConstant.PK_FBHT);
+		sk_sb.append(" ) ");
+		sk_sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
+//		sk_sb.append(" order by ct_pu.pk_org , ");
+		
+		
+//		StringBuffer sk_sb = new StringBuffer("");
+//		sk_sb.append(newsql);
+//		sk_sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+//		sk_sb.append(" where  ");
+////		sk_sb.append(" ( ");
+//		// ---总包合同为收款合同，且收款合同不能同时为空----start--------------
+////		sk_sb.append(" ( ");
+//		sk_sb.append(" ct_pu.vdef5 = " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef5   ");
+//		sk_sb.append(" and ");
+//		sk_sb.append(" nvl(ct_pu.vdef5,'1')!='1'  ");
+//		sk_sb.append(" and ");
+//		sk_sb.append(" ct_pu.vdef5 <> '~' ");
+////		sk_sb.append(" and (  ");
+////		sk_sb.append("  ( nvl(ct_pu.vdef5,'1')='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+////		sk_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')='1' ) ");
+////		sk_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+////		sk_sb.append(" ) ");
+////		sk_sb.append(" ) ");
+//		// ---总包合同为收款合同，且收款合同不能同时为空----end--------------
+////		sk_sb.append(" or ct_pu.pk_ct_pu= "	+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "." + FBPuCtRptFieldConstant.PK_FBHT);
+////		sk_sb.append(" ) ");
+//		sk_sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
+//		
+//		StringBuffer xs_sb = new StringBuffer("");
+//		xs_sb.append(newsql);
+//		xs_sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+//		xs_sb.append(" where  ");
+////		xs_sb.append(" ( ");
+//		// ---总包合同为销售合同，且销售合同不能同时为空----start--------------
+////		xs_sb.append(" ( ");
+//		xs_sb.append("  ct_pu.vdef15 ="	+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + ".vdef15  ");
+//		sk_sb.append(" and ");
+//		sk_sb.append(" nvl(ct_pu.vdef15,'1')!='1'  ");
+//		sk_sb.append(" and ");
+//		sk_sb.append(" ct_pu.vdef15 <> '~' ");
+////		xs_sb.append(" and (  ");
+////		xs_sb.append("  ( nvl(ct_pu.vdef5,'1')='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+////		xs_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')='1' ) ");
+////		xs_sb.append(" or ( nvl(ct_pu.vdef5,'1')!='1' and nvl(ct_pu.vdef15,'1')!='1' ) ");
+////		xs_sb.append(" ) ");
+////		xs_sb.append(" ) ");
+//		// ---总包合同为销售合同，且销售合同不能同时为空----end--------------
+////		xs_sb.append(" or ct_pu.pk_ct_pu= "
+////				+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "."
+////				+ FBPuCtRptFieldConstant.PK_FBHT);
+////		xs_sb.append(" ) ");
+//		xs_sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
+//		
+//		
+//		StringBuffer ct_sb = new StringBuffer("");
+//		ct_sb.append(newsql);
+//		ct_sb.append(" , " + FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS);
+//		ct_sb.append(" where  ");
+//		ct_sb.append("  ct_pu.pk_ct_pu= "
+//				+ FBPuCtRptConstant.TEM_FBPUCT_FROM_CONDITIONS + "."
+//				+ FBPuCtRptFieldConstant.PK_FBHT);
+//		ct_sb.append(" and ct_pu.dr =0  and ct_pu.blatest='Y' ");
+//		
+//		StringBuffer sb = new StringBuffer("");
+//		sb.append(sk_sb.toString());
+//		sb.append(" union  ");
+//		sb.append(xs_sb.toString());
+//		sb.append(" union  ");
+//		sb.append(ct_sb.toString());
+		
+		String query_sql =sk_sb.toString().replace("select ", " select distinct ");
+		DataAccessUtils querytool = new DataAccessUtils();
+//		throw new RuntimeException("dd");
+		
+		IRowSet is = querytool.query(query_sql);
+		String[][] objs = is.toTwoDimensionStringArray();
+		dataset.setDatas(objs);
+	}
 
 	/**
 	 * 处理验收入库/进度金额、已收发票金额、付款金额
@@ -776,7 +888,8 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		}
 		// 处理总包合同（销售合同或收款合同），把总包合同下的合同全部查询出来
 		// 关于合同的过滤条件都在这处理
-		this.queryAllCt(dataset);
+//		this.queryAllCt(dataset);
+		this.queryAllCt_noother_org(dataset);
 		Map<String, FBPuCtRptVO> vomap = new HashMap<String, FBPuCtRptVO>();
 		// 处理累计的数据
 		 this.processMny(dataset, vomap, null);
