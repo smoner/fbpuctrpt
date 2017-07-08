@@ -1184,10 +1184,59 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		/***------------------------优化前----end---------------------**/		
 
 		/***------------------------优化后----start---------------------**/
-		//sb.append(" select distinct tem_fbpuct_pay.pk_ct_pu pk_ct_pu, sum(ap_payitem.local_notax_de) nmny, sum(ap_payitem.local_money_de) ntaxmny  from tem_fbpuct_pay  inner join ap_payitem  on ap_payitem.pk_payitem = tem_fbpuct_pay.bid  inner join ap_paybill   on ap_paybill.pk_paybill = ap_payitem.pk_paybill ");
-		sb.append(" select distinct tem_fbpuct_pay.pk_ct_pu pk_ct_pu, sum(ap_payitem.local_notax_de) nmny, sum(ap_payitem.local_money_de) ntaxmny  FROM  tem_fbpuct_allct tem_fbpuct_pay INNER JOIN ct_pu ON ct_pu.pk_ct_pu = tem_fbpuct_pay.pk_ct_pu INNER JOIN ap_payitem ON ap_payitem.contractno = ct_pu.vbillcode  INNER JOIN ap_paybill ON ap_paybill.pk_paybill = ap_payitem.pk_paybill  ");
-		sb.append(" where 1=1 and ct_pu.dr =0 and ap_payitem.dr = 0 and ap_paybill.dr = 0 ");
-		String date = " ap_paybill.billdate ";
+		
+
+
+		
+//		//sb.append(" select distinct tem_fbpuct_pay.pk_ct_pu pk_ct_pu, sum(ap_payitem.local_notax_de) nmny, sum(ap_payitem.local_money_de) ntaxmny  from tem_fbpuct_pay  inner join ap_payitem  on ap_payitem.pk_payitem = tem_fbpuct_pay.bid  inner join ap_paybill   on ap_paybill.pk_paybill = ap_payitem.pk_paybill ");
+//		sb.append(" select distinct tem_fbpuct_pay.pk_ct_pu pk_ct_pu, sum(ap_payitem.local_notax_de) nmny, sum(ap_payitem.local_money_de) ntaxmny  FROM  tem_fbpuct_allct tem_fbpuct_pay INNER JOIN ct_pu ON ct_pu.pk_ct_pu = tem_fbpuct_pay.pk_ct_pu INNER JOIN ap_payitem ON ap_payitem.contractno = ct_pu.vbillcode  INNER JOIN ap_paybill ON ap_paybill.pk_paybill = ap_payitem.pk_paybill  ");
+//		sb.append(" where 1=1 and ct_pu.dr =0 and ap_payitem.dr = 0 and ap_paybill.dr = 0 ");
+//		String date = " ap_paybill.billdate ";
+//		if (StringUtils.isNotBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and  " + date + " < '" + date_end + "' and " + date
+//					+ " >= '" + date_start + "' ");
+//		} else if (StringUtils.isBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and " + date + "  < '" + date_end + "' ");
+//		}
+//		sb.append(" group by tem_fbpuct_pay.pk_ct_pu ");
+//		/***------------------------优化后----start---------------------**/
+//		DataAccessUtils querytool = new DataAccessUtils();
+//		IRowSet rs = querytool.query(sb.toString());
+//		if (rs != null && rs.size() > 0) {
+//			String[][] objs = rs.toTwoDimensionStringArray();
+//			for (String[] arr : objs) {
+//				String paymentmny_all = arr[1];
+//				String pk_ct_pu = arr[0];
+//				if (StringUtils.isBlank(paymentmny_all)) {
+//					continue;
+//				}
+//				FBPuCtRptVO vo = vomap.get(pk_ct_pu);
+//				if (vo == null) {
+//					vo = new FBPuCtRptVO();
+//					vo.setValue(fieldname, paymentmny_all);
+//					vomap.put(pk_ct_pu, vo);
+//				} else {
+//					vo.setValue(fieldname, paymentmny_all);
+//				}
+//			}
+//		}
+//		
+//		
+		/***------------------------优化后----start---------------------**/
+		
+		
+		/***------------------------付款金额不再从ap_payitem里去,从ct_payplan中取----start---------------------**/
+		
+		sb.append(" SELECT DISTINCT tem_fbpuct_allct.pk_ct_pu pk_ct_pu, SUM (ct_payplan.naccumpayorgmny) nmny,  SUM (ct_payplan.naccumpaymny) ntaxmny");
+		sb.append(" FROM tem_fbpuct_allct tem_fbpuct_allct INNER JOIN ct_pu  ON ct_pu.pk_ct_pu = tem_fbpuct_allct.pk_ct_pu ");
+		sb.append("      INNER JOIN ct_payplan ON ct_payplan.pk_ct_pu =  ct_pu.pk_ct_pu           ");     
+		sb.append(" WHERE 1 = 1");
+		sb.append(" AND ct_pu.dr = 0");
+		sb.append(" AND ct_payplan.dr = 0");
+		
+		String date = " ct_payplan.ts ";
 		if (StringUtils.isNotBlank(date_start)
 				&& StringUtils.isNotBlank(date_end)) {
 			sb.append(" and  " + date + " < '" + date_end + "' and " + date
@@ -1196,8 +1245,7 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 				&& StringUtils.isNotBlank(date_end)) {
 			sb.append(" and " + date + "  < '" + date_end + "' ");
 		}
-		sb.append(" group by tem_fbpuct_pay.pk_ct_pu ");
-		/***------------------------优化后----start---------------------**/
+		sb.append(" group by tem_fbpuct_allct.pk_ct_pu ");
 		DataAccessUtils querytool = new DataAccessUtils();
 		IRowSet rs = querytool.query(sb.toString());
 		if (rs != null && rs.size() > 0) {
