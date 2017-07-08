@@ -22,7 +22,8 @@ public class FBPuCtRptQueryInitializer implements ISCMReportQueryInitializer {
 
 	  @Override
 	  public UFBoolean isPowerEnable() {
-	    return UFBoolean.TRUE;
+		  return UFBoolean.FALSE;
+//	    return UFBoolean.TRUE;
 	  }
 
 	}

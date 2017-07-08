@@ -90,7 +90,7 @@ public class FBPuCtRptRefInitialzer extends SCMRptQueryConditionDLGInitializer {
 
 	@Override
 	protected void initRef(QueryConditionDLGDelegator delegator) {
-		// this.filterOrg(delegator);
+//		 this.filterOrg(delegator);
 		// this.filterMaterialoid(delegator, ExecPriceQueryConst.MATERIALCODE);
 		// this.filterMaterial(delegator, ExecPriceQueryConst.MATERIALCODE);
 		// this.filterMarClass(delegator, ExecPriceQueryConst.MARBASCLASS);

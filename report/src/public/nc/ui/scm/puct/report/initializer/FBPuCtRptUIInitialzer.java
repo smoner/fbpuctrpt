@@ -42,6 +42,6 @@ public class FBPuCtRptUIInitialzer implements ISCMReportQueryUIInitializer {
 
 	@Override
 	public UFBoolean isPowerEnable() {
-		return UFBoolean.TRUE;
+		return UFBoolean.FALSE;
 	}
 }
