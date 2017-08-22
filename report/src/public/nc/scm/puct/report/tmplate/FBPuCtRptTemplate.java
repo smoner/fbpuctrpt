@@ -771,7 +771,9 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		if (rs != null && rs.size() > 0) {
 			String[][] objs = rs.toTwoDimensionStringArray();
 			for (String[] arr : objs) {
-				String invoicemny_all = arr[1];
+				//这个表已开发票金额应该取含税金额，现在取的未税金额
+//				String invoicemny_all = arr[1];
+				String invoicemny_all = arr[2];
 				String pk_ct_pu = arr[0];
 				if (StringUtils.isBlank(invoicemny_all)) {
 					continue;
