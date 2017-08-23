@@ -37,18 +37,18 @@ public class FBTempTable {
 	   * @param data 要插入临时表的数据
 	   * @return 临时表名
 	   */
-	  public String getTempTable(String tablename, String[] columns,
-	      String[] columnTypes, JavaType[] types, List<List<Object>> data) {
-	    this.validate(columns, columnTypes, types);
-
-	    String name = this.getTempTable(tablename, columns, columnTypes);
-	    if (data.size() == 0) {
-	      return name;
-	    }
-
-	    this.insertData(columns, columnTypes, types, data, name);
-	    return name;
-	  }
+//	  public String getTempTable(String tablename, String[] columns,
+//	      String[] columnTypes, JavaType[] types, List<List<Object>> data) {
+//	    this.validate(columns, columnTypes, types);
+//
+//	    String name = this.getTempTable(tablename, columns, columnTypes);
+//	    if (data.size() == 0) {
+//	      return name;
+//	    }
+//
+//	    this.insertData(columns, columnTypes, types, data, name);
+//	    return name;
+//	  }
 
 	  /**
 	   * 创建临时表

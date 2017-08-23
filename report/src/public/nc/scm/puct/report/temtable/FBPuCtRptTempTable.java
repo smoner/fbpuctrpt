@@ -10,7 +10,17 @@ import nc.vo.pub.JavaType;
 
 public class FBPuCtRptTempTable extends FBPuCtRptAbstractTempTable {
 	public FBPuCtRptTempTable(String tabname) {
-		super(tabname, getFieldnames(), getFieldSqlTypes(), getFieldJavaTypes());
+		super(tabname, getFieldnames(), getFieldSqlTypes(),getIndexFieldnames(), getFieldJavaTypes());
+	}
+
+	public static String[] getIndexFieldnames() {
+		List<String> filednames = new ArrayList<String>();
+		filednames.add("pk_ct_pu");
+		filednames.add("pk_org");
+		filednames.add("cvendorid");
+		filednames.add("vdef15");
+		filednames.add("vdef5");
+		return filednames.toArray(new String[0]);
 	}
 
 	public static String[] getFieldnames() {

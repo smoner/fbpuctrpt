@@ -18,10 +18,36 @@ public class FBPuCtRptAbstractTempTable {
 	  private String[] columns;
 
 	  private String[] columnTypes;
-
+	  
+	  private String[] indexColumns;
+	  
 	  private JavaType[] javaTypes;
 
 	  private String name;
+
+//	  /**
+//	   * AbstractTempTab 的构造子
+//	   * 
+//	   * @param name
+//	   *          表名
+//	   * @param columns
+//	   *          列名
+//	   * @param columnTypes
+//	   *          列类型，如char(20)
+//	   * @param javaTypes
+//	   *          如：JavaType.String
+//	   */
+//	  public FBPuCtRptAbstractTempTable(
+//	      String name, String[] columns, String[] columnTypes, JavaType[] javaTypes) {
+//	    this.name = name;
+//	    this.columns = columns;
+//	    this.columnTypes = columnTypes;
+//	    this.javaTypes = javaTypes;
+//	    FBTempTable tt = new FBTempTable();
+//	    this.name =
+//	        tt.getTempTable(name, columns, columnTypes, javaTypes,
+//	            new ArrayList<List<Object>>());
+//	  }
 
 	  /**
 	   * AbstractTempTab 的构造子
@@ -36,14 +62,15 @@ public class FBPuCtRptAbstractTempTable {
 	   *          如：JavaType.String
 	   */
 	  public FBPuCtRptAbstractTempTable(
-	      String name, String[] columns, String[] columnTypes, JavaType[] javaTypes) {
+	      String name, String[] columns, String[] columnTypes,String[] indexColumns, JavaType[] javaTypes) {
 	    this.name = name;
 	    this.columns = columns;
 	    this.columnTypes = columnTypes;
+	    this.indexColumns = indexColumns;
 	    this.javaTypes = javaTypes;
 	    FBTempTable tt = new FBTempTable();
 	    this.name =
-	        tt.getTempTable(name, columns, columnTypes, javaTypes,
+	        tt.getTempTable(name, columns, columnTypes,indexColumns, javaTypes,
 	            new ArrayList<List<Object>>());
 	  }
 
@@ -156,7 +183,7 @@ public class FBPuCtRptAbstractTempTable {
 	    }
 	    FBTempTable tt = new FBTempTable();
 	    this.name =
-	        tt.getTempTable(this.name, this.columns, this.columnTypes,
+	        tt.getTempTable(this.name, this.columns, this.columnTypes,this.indexColumns,
 	            this.javaTypes, data);
 	  }
 
