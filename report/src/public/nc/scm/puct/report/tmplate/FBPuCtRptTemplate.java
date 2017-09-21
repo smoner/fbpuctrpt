@@ -24,6 +24,7 @@ import nc.scmmm.vo.scmpub.report.entity.metadata.SCMField;
 import nc.scmmm.vo.scmpub.report.entity.metadata.SCMProviderMetaData;
 import nc.scmmm.vo.scmpub.report.viewfactory.define.SCMView;
 import nc.vo.ct.purdaily.entity.CtPuVO;
+import nc.vo.ecpubapp.pattern.exception.ExceptionUtils;
 import nc.vo.pub.BusinessException;
 import nc.vo.pub.lang.UFDouble;
 import nc.vo.pub.query.ConditionVO;
@@ -32,6 +33,7 @@ import nc.vo.pubapp.pattern.data.IRowSet;
 import org.apache.commons.lang.StringUtils;
 
 public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
+	private int year_query = 0 ;
 	private boolean has_project =false;
 	private boolean has_zbct =false;
 	private boolean has_supply =false;
@@ -267,6 +269,16 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 //					 where.append(" and ");
 //					 where.append(" ct_pu.dbilldate <= '"+endDate+"' ");
 //				 }
+			}
+			// 年份
+			else if (condvo.getFieldCode().contains("year_query")) {
+				String str = condvo.getSQLStr();
+				String year= condvo.getValue();
+				if(StringUtils.isNotBlank(year)&&year.contains(",")){
+					ExceptionUtils.wrappBusinessException("只能选择一个会计年度!");
+				}else{
+					this.year_query=Integer.valueOf(year).intValue();
+				}
 			}
 		}
 	}
@@ -536,7 +548,14 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		Date date = new Date();
 		c.setTime(date);
 		int year = c.get(Calendar.YEAR);
+		int year_old = year ;
+		if(this.year_query!=0){
+			year = year_query;
+		}
 		int month = c.get(Calendar.MONTH) + 1;
+		if(year_query!=0&&year_query<year_old){
+			month = 12 ;
+		}
 //		int day = c.get(Calendar.DAY_OF_MONTH);
 
 		// Calendar c2 = Calendar.getInstance();
