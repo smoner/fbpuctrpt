@@ -668,7 +668,9 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		/***------------------------优化后----start---------------------**/
 		sb.append(" select distinct tem_fbpuct_in.pk_ct_pu pk_ct_pu, sum(ic_purchasein_b.nmny) nmny, sum(ic_purchasein_b.ntaxmny) ntaxmny  from tem_fbpuct_in  inner join ic_purchasein_b on ic_purchasein_b.cgeneralbid = tem_fbpuct_in.bid  inner join ic_purchasein_h  on ic_purchasein_h.cgeneralhid = ic_purchasein_b.cgeneralhid ");
 		sb.append(" where 1=1 and ic_purchasein_b.dr =0 and ic_purchasein_h.dr = 0 ");
-		String date = " ic_purchasein_h.dbilldate ";
+//		String date = " ic_purchasein_h.dbilldate ";
+		//--modify 20170830  1.“验收入库金额”列取数，目前系统按照单据日期取数，希望调整为按照入库单签字日期取数；
+		String date = " ic_purchasein_h.taudittime ";
 		if (StringUtils.isNotBlank(date_start)
 				&& StringUtils.isNotBlank(date_end)) {
 			sb.append(" and  " + date + " < '" + date_end + "' and " + date
@@ -1229,16 +1231,58 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		/***------------------------优化后----start---------------------**/
 		
 		
-		/***------------------------付款金额不再从ap_payitem里去,从ct_payplan中取----start---------------------**/
+//		/***------------------------付款金额不再从ap_payitem里去,从ct_payplan中取----start---------------------**/
+//		
+//		sb.append(" SELECT DISTINCT tem_fbpuct_allct.pk_ct_pu pk_ct_pu, SUM (ct_payplan.naccumpayorgmny) nmny,  SUM (ct_payplan.naccumpaymny) ntaxmny");
+//		sb.append(" FROM tem_fbpuct_allct t INNER JOIN ct_pu  ON ct_pu.pk_ct_pu = tem_fbpuct_allct.pk_ct_pu ");
+//		sb.append("      INNER JOIN ct_payplan ON ct_payplan.pk_ct_pu =  ct_pu.pk_ct_pu           ");     
+//		sb.append(" WHERE 1 = 1");
+//		sb.append(" AND ct_pu.dr = 0");
+//		sb.append(" AND ct_payplan.dr = 0");
+//		
+//		String date = " ct_payplan.ts ";
+//		if (StringUtils.isNotBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and  " + date + " < '" + date_end + "' and " + date
+//					+ " >= '" + date_start + "' ");
+//		} else if (StringUtils.isBlank(date_start)
+//				&& StringUtils.isNotBlank(date_end)) {
+//			sb.append(" and " + date + "  < '" + date_end + "' ");
+//		}
+//		sb.append(" group by tem_fbpuct_allct.pk_ct_pu ");
+//		DataAccessUtils querytool = new DataAccessUtils();
+//		IRowSet rs = querytool.query(sb.toString());
+//		if (rs != null && rs.size() > 0) {
+//			String[][] objs = rs.toTwoDimensionStringArray();
+//			for (String[] arr : objs) {
+//				String paymentmny_all = arr[1];
+//				String pk_ct_pu = arr[0];
+//				if (StringUtils.isBlank(paymentmny_all)) {
+//					continue;
+//				}
+//				FBPuCtRptVO vo = vomap.get(pk_ct_pu);
+//				if (vo == null) {
+//					vo = new FBPuCtRptVO();
+//					vo.setValue(fieldname, paymentmny_all);
+//					vomap.put(pk_ct_pu, vo);
+//				} else {
+//					vo.setValue(fieldname, paymentmny_all);
+//				}
+//			}
+//		}
 		
-		sb.append(" SELECT DISTINCT tem_fbpuct_allct.pk_ct_pu pk_ct_pu, SUM (ct_payplan.naccumpayorgmny) nmny,  SUM (ct_payplan.naccumpaymny) ntaxmny");
-		sb.append(" FROM tem_fbpuct_allct tem_fbpuct_allct INNER JOIN ct_pu  ON ct_pu.pk_ct_pu = tem_fbpuct_allct.pk_ct_pu ");
-		sb.append("      INNER JOIN ct_payplan ON ct_payplan.pk_ct_pu =  ct_pu.pk_ct_pu           ");     
+		
+		
+		/***---modify 20170830 ---付款金额从ap_payitem里取,直接拿临时表和ap_payitem\ap_paybill关联----start------**/
+		
+		sb.append(" SELECT DISTINCT tem_fbpuct_allct.pk_ct_pu pk_ct_pu, SUM (ap_payitem.local_money_de) nmny");
+		sb.append(" FROM tem_fbpuct_allct  INNER JOIN ap_payitem  ON ap_payitem.top_billid = tem_fbpuct_allct.pk_ct_pu ");
+		sb.append("      INNER JOIN ap_paybill ON ap_paybill.pk_paybill =  ap_payitem.pk_paybill           ");     
 		sb.append(" WHERE 1 = 1");
-		sb.append(" AND ct_pu.dr = 0");
-		sb.append(" AND ct_payplan.dr = 0");
+		sb.append(" AND ap_paybill.dr = 0");
+		sb.append(" AND ap_payitem.dr = 0");
 		
-		String date = " ct_payplan.ts ";
+		String date = " ap_paybill.billdate ";
 		if (StringUtils.isNotBlank(date_start)
 				&& StringUtils.isNotBlank(date_end)) {
 			sb.append(" and  " + date + " < '" + date_end + "' and " + date
