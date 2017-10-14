@@ -9,6 +9,7 @@ import java.util.Map;
 
 
 import nc.impl.pubapp.pattern.database.DataAccessUtils;
+import nc.pub.smart.metadata.Field;
 import nc.scm.puct.report.temtable.FBPuCtRptTemptableUtils;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptConstant;
 import nc.scm.puct.report.tmplate.source.FBPuCtRptFieldConstant;
@@ -62,6 +63,12 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 	protected SCMProviderMetaData getSCMRptMetaData() throws BusinessException {
 		SCMProviderMetaData metaData = new SCMProviderMetaData();
 		this.addHeadFields(metaData);
+		Field[] fields =metaData.getFields();
+		for(Field f:fields){
+			if(f.getDbColumnType()==12){
+				f.setPrecision(999);
+			}
+		}
 		return metaData;
 	}
 
