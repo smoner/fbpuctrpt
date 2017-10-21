@@ -287,6 +287,18 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 					this.year_query=Integer.valueOf(year).intValue();
 				}
 			}
+			// 合同类型
+			else if (condvo.getFieldCode().contains("ctrantypeid")) {
+				condvo.setFieldCode("ct_pu.ctrantypeid");
+				this.condsFromQryDlgList.add(condvo);
+//				String str = condvo.getSQLStr();
+//				String year= condvo.getValue();
+//				if(StringUtils.isNotBlank(year)&&year.contains(",")){
+//					ExceptionUtils.wrappBusinessException("只能选择一个会计年度!");
+//				}else{
+//					this.year_query=Integer.valueOf(year).intValue();
+//				}
+			}
 		}
 	}
 	
@@ -1013,7 +1025,9 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		
 		//处理条款约定ct_pu_term.vtermcontent、合同内容vdef19、合同类别vdef20
 		Map<String,String> ht_tiaokuan_map = new HashMap<String,String>();
-		Map<String,String> ht_neirong_map = new HashMap<String,String>();
+		/*-------start-------modify 20171021 把合同内容更改为合同类型--------------------**/
+//		Map<String,String> ht_neirong_map = new HashMap<String,String>();
+		/*-------end-------modify 20171021 把合同内容更改为合同类型--------------------**/
 		StringBuffer ht_sql = new StringBuffer("");
 		ht_sql.append(" select distinct "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".pk_ct_pu , ct_pu.vdef19, ct_pu.vdef20, ct_pu_term.vtermcontent  from "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+" ,ct_pu ,ct_pu_term  where "+FBPuCtRptConstant.TEM_FBPUCT_FINAL+".pk_ct_pu = ct_pu.pk_ct_pu and ct_pu.pk_ct_pu = ct_pu_term.pk_ct_pu and ct_pu_term.dr = 0 ") ;
 		IRowSet ht_rs = tool.query(ht_sql.toString());
@@ -1021,7 +1035,9 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 			String[][] arr = ht_rs.toTwoDimensionStringArray();
 			for(String[] ar :arr){
 				String pk_ct_pu = ar[0] ;
-				ht_neirong_map.put(pk_ct_pu,ar[1]);
+				/*-------start-------modify 20171021 把合同内容更改为合同类型--------------------**/
+//				ht_neirong_map.put(pk_ct_pu,ar[1]);
+				/*-------end-------modify 20171021 把合同内容更改为合同类型--------------------**/
 				if(ht_tiaokuan_map.containsKey(pk_ct_pu)){
 					StringBuffer sb = new StringBuffer(ht_tiaokuan_map.get(pk_ct_pu));
 					sb.append(ar[3]);
@@ -1105,8 +1121,11 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		//进度
 		int index_nrate_all = indexmap.get(FBPuCtRptFieldConstant.NRATE_ALL).intValue();
 		
+
+		/*-------start-------modify 20171021 把合同内容更改为合同类型--------------------**/
 		//合同内容vdef19
-		int index_ht_context = indexmap.get(FBPuCtRptFieldConstant.CHTCONTENT).intValue();
+//		int index_ht_context = indexmap.get(FBPuCtRptFieldConstant.CHTCONTENT).intValue();
+		/*-------end-------modify 20171021 把合同内容更改为合同类型--------------------**/
 		
 		//合同条款vdef20
 		int index_ht_tiaokuan = indexmap.get(FBPuCtRptFieldConstant.CAGREEMENT).intValue();
@@ -1115,7 +1134,9 @@ public class FBPuCtRptTemplate extends SimpleAbsRptDataSetTemplet {
 		for (int i = 0; i < num; i++) {
 			String pk = (String) arrs[i][index_pk];
 			String pk_org = (String) arrs[i][index_pk_org];
-			arrs[i][index_ht_context] = ht_neirong_map.get(pk);
+			/*-------start-------modify 20171021 把合同内容更改为合同类型--------------------**/
+//			arrs[i][index_ht_context] = ht_neirong_map.get(pk);
+			/*-------end-------modify 20171021 把合同内容更改为合同类型--------------------**/
 			String httk = ht_tiaokuan_map.get(pk);
 			if(StringUtils.isNotBlank(httk)&&httk.length()>100){
 				arrs[i][index_ht_tiaokuan] = httk.substring(0, 100);

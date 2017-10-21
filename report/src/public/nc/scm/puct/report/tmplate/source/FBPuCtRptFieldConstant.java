@@ -31,9 +31,12 @@ public class FBPuCtRptFieldConstant {
 	public static final String CVENDORID=CtPuVO.CVENDORID;
 	//“合同类别"
 	public static final String CHTTYPE="chttype";
+	/*-------start-------modify 20171021 把合同内容更改为合同类型--------------------**/
 	//“合同内容"
 //	public static final String CHTCONTENT="chtcontent";
-	public static final String CHTCONTENT="vdef19";
+//	public static final String CHTCONTENT="vdef19";
+	public static final String CHTCONTENT="ctrantypeid";
+	/*-------end-------modify 20171021 把合同内容更改为合同类型--------------------**/
 	//“合同金额"
 	public static final String NHTMNY=CtPuVO.NTOTALTAXMNY;
 	//“合同成本"

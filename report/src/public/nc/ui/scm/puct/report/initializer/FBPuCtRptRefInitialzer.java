@@ -8,7 +8,9 @@ import nc.ui.scmpub.query.refregion.QMarterialFilter;
 import nc.ui.scmpub.query.refregion.QMarterialoidFilter;
 import nc.ui.scmpub.query.refregion.QPsndocFilter;
 import nc.ui.scmpub.query.refregion.QSupplierFilter;
+import nc.ui.scmpub.query.refregion.QTransTypeFilter;
 import nc.vo.pub.lang.UFBoolean;
+import nc.vo.scmpub.res.billtype.CTBillType;
 
 @SuppressWarnings("restriction")
 public class FBPuCtRptRefInitialzer extends SCMRptQueryConditionDLGInitializer {
@@ -90,6 +92,8 @@ public class FBPuCtRptRefInitialzer extends SCMRptQueryConditionDLGInitializer {
 
 	@Override
 	protected void initRef(QueryConditionDLGDelegator delegator) {
+//		QTransTypeFilter qTransTypeFilter = 
+		new QTransTypeFilter(delegator, "ctrantypeid", CTBillType.PurDaily.getCode()).filter();
 //		 this.filterOrg(delegator);
 		// this.filterMaterialoid(delegator, ExecPriceQueryConst.MATERIALCODE);
 		// this.filterMaterial(delegator, ExecPriceQueryConst.MATERIALCODE);
